@@ -1,0 +1,476 @@
+// =========================================
+// Card Component - Modern Playing Cards
+// =========================================
+
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.card {
+  position: relative;
+  width: $card-width;
+  height: $card-height;
+  border-radius: $card-border-radius;
+  cursor: pointer;
+  transition: all $transition-fast;
+  -webkit-user-select: none;
+  user-select: none;
+  
+  // Modern card hover effect
+  &:hover {
+    transform: translateY(-3px) scale(1.02);
+    filter: brightness(1.05);
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    width: $card-width-small;
+    height: $card-height-small;
+  }
+  
+  @media (min-width: $breakpoint-xl) {
+    width: $card-width-large;
+    height: $card-height-large;
+  }
+}
+
+// =========================================
+// CARD FACE (FRONT)
+// =========================================
+
+.card__front {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    linear-gradient(145deg, #ffffff 0%, #fafafa 100%);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: $card-border-radius;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.1),
+    0 2px 4px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: $spacing-2;
+  overflow: hidden;
+  
+  // Subtle card texture
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.02) 0%, transparent 50%);
+    border-radius: $card-border-radius;
+    pointer-events: none;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-1;
+  }
+}
+
+// =========================================
+// CARD BACK
+// =========================================
+
+.card__back {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(ellipse at center, #2563eb 0%, #1d4ed8 30%, #1e40af 70%, #1e3a8a 100%);
+  border: 1px solid #1e40af;
+  border-radius: $card-border-radius;
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    0 2px 4px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  color: $color-white;
+  overflow: hidden;
+  
+  .card__pattern {
+    position: absolute;
+    top: 46%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 80px;
+    opacity: 0.9;
+    text-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.4),
+      0 0 16px rgba(255, 255, 255, 0.1);
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    z-index: 10;
+    line-height: 1;
+    
+    @media (max-width: $breakpoint-md) {
+      font-size: 72px;
+    }
+    
+    @media (min-width: $breakpoint-xl) {
+      font-size: 72px;
+    }
+  }
+  
+  // Elegant geometric pattern
+  &::before {
+    content: '';
+    position: absolute;
+    top: $spacing-2;
+    left: $spacing-2;
+    right: $spacing-2;
+    bottom: $spacing-2;
+    background-image: 
+      radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(45deg, transparent 40%, rgba(255, 255, 255, 0.02) 50%, transparent 60%),
+      linear-gradient(-45deg, transparent 40%, rgba(255, 255, 255, 0.02) 50%, transparent 60%);
+    background-size: 16px 16px, 16px 16px, 32px 32px, 32px 32px;
+    border-radius: $card-border-radius;
+    opacity: 0.7;
+  }
+  
+  // Inner border for premium feel
+  &::after {
+    content: '';
+    position: absolute;
+    top: $spacing-1;
+    left: $spacing-1;
+    right: $spacing-1;
+    bottom: $spacing-1;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: $card-border-radius - 2px;
+    pointer-events: none;
+  }
+}
+
+// =========================================
+// CARD CONTENT AREAS
+// =========================================
+
+.card__corner {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+  z-index: 2;
+  
+  &--top-left {
+    top: $spacing-1;
+    left: $spacing-1;
+  }
+  
+  &--bottom-right {
+    bottom: $spacing-1;
+    right: $spacing-1;
+    transform: rotate(180deg);
+  }
+}
+
+.card__center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+// =========================================
+// CARD RANK AND SUIT
+// =========================================
+
+.card__rank {
+  font-size: $font-size-base;
+  font-weight: $font-weight-bold;
+  font-family: $font-family-sans;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.8);
+  line-height: 1;
+  margin-bottom: 1px;
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-sm;
+  }
+  
+  @media (min-width: $breakpoint-xl) {
+    font-size: $font-size-lg;
+  }
+}
+
+.card__suit {
+  font-size: $font-size-base;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.1));
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: $font-size-sm;
+  }
+  
+  @media (min-width: $breakpoint-xl) {
+    font-size: $font-size-lg;
+  }
+  
+  &--large {
+    font-size: 2.2rem;
+    opacity: 0.4;
+    font-weight: $font-weight-normal;
+    filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.15));
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
+    
+    @media (max-width: $breakpoint-md) {
+      font-size: 1.6rem;
+    }
+    
+    @media (min-width: $breakpoint-xl) {
+      font-size: 2.8rem;
+    }
+  }
+}
+
+// =========================================
+// CARD COLOR VARIANTS
+// =========================================
+
+.card--red {
+  .card__rank,
+  .card__suit {
+    color: #dc2626;
+  }
+  
+  .card__suit--large {
+    color: #dc2626;
+    opacity: 0.35;
+  }
+}
+
+.card--black {
+  .card__rank,
+  .card__suit {
+    color: #1f2937;
+  }
+  
+  .card__suit--large {
+    color: #1f2937;
+    opacity: 0.35;
+  }
+}
+
+// =========================================
+// CARD STATES
+// =========================================
+
+.card--face-down {
+  .card__front {
+    display: none;
+  }
+  
+  .card__back {
+    display: flex;
+  }
+}
+
+.card--face-up {
+  .card__front {
+    display: flex;
+  }
+  
+  .card__back {
+    display: none;
+  }
+}
+
+.card--highlighted {
+  .card__front {
+    border-color: $color-accent;
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.1),
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 0 0 2px $color-accent,
+      0 0 16px rgba($color-accent, 0.4);
+  }
+}
+
+.card--winning {
+  // Use glow animation instead of scaling to avoid layout breaks
+  animation: winningCardGlow 2s infinite ease-in-out;
+  
+  .card__front {
+    border-color: #ffd700;
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.1),
+      0 2px 4px rgba(0, 0, 0, 0.06),
+      0 0 0 3px #ffd700,
+      0 0 20px rgba(255, 215, 0, 0.6),
+      0 0 40px rgba(255, 215, 0, 0.3);
+    background: 
+      linear-gradient(145deg, #ffffff 0%, #fffef8 100%);
+    overflow: visible;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -4px;
+      left: -4px;
+      right: -4px;
+      bottom: -4px;
+      background: linear-gradient(45deg, 
+        rgba(255, 215, 0, 0.3), 
+        rgba(255, 255, 255, 0.1), 
+        rgba(255, 215, 0, 0.3),
+        rgba(255, 255, 255, 0.1),
+        rgba(255, 215, 0, 0.3)
+      );
+      background-size: 400% 400%;
+      border-radius: inherit;
+      z-index: -1;
+      animation: winningCardShimmer 3s ease-in-out infinite;
+    }
+    
+    &::after {
+      content: '✨';
+      position: absolute;
+      top: -15px;
+      right: -10px;
+      font-size: 20px;
+      z-index: 10;
+      filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.8));
+      
+      @media (max-width: $breakpoint-md) {
+        font-size: 16px;
+        top: -12px;
+        right: -8px;
+      }
+    }
+  }
+  
+  // Enhanced hover effect for winning cards - no scaling to preserve layout
+  &:hover {
+    transform: translateY(-6px);
+    
+    .card__front {
+      box-shadow: 
+        0 8px 20px rgba(0, 0, 0, 0.15),
+        0 4px 8px rgba(0, 0, 0, 0.1),
+        0 0 0 3px #ffd700,
+        0 0 30px rgba(255, 215, 0, 0.8),
+        0 0 60px rgba(255, 215, 0, 0.4);
+    }
+  }
+}
+
+.card--selected {
+  transform: translateY(-6px);
+  
+  .card__front {
+    border-color: $color-primary;
+    box-shadow: 
+      0 8px 20px rgba(0, 0, 0, 0.15),
+      0 4px 8px rgba(0, 0, 0, 0.1),
+      0 0 0 2px $color-primary,
+      0 0 20px rgba($color-primary, 0.3);
+  }
+}
+
+.card--disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+  
+  &:hover {
+    transform: none;
+    filter: grayscale(0.5);
+  }
+}
+
+// =========================================
+// WINNING CARD ANIMATIONS
+// =========================================
+
+@keyframes winningCardGlow {
+  0% {
+    filter: brightness(1) drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
+  }
+  
+  50% {
+    filter: brightness(1.1) drop-shadow(0 0 16px rgba(255, 215, 0, 0.8));
+  }
+  
+  100% {
+    filter: brightness(1) drop-shadow(0 0 8px rgba(255, 215, 0, 0.4));
+  }
+}
+
+@keyframes winningCardShimmer {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  
+  50% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+  
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+}
+
+// Responsive winning card animations
+@media (max-width: $breakpoint-md) {
+  .card--winning {
+    .card__front::after {
+      animation-duration: 2.5s; // Slightly slower on mobile
+    }
+  }
+  
+  @keyframes winningCardGlow {
+    0% {
+      filter: brightness(1) drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
+    }
+    
+    50% {
+      filter: brightness(1.08) drop-shadow(0 0 12px rgba(255, 215, 0, 0.7));
+    }
+    
+    100% {
+      filter: brightness(1) drop-shadow(0 0 6px rgba(255, 215, 0, 0.4));
+    }
+  }
+}
+
+// Reduced motion accessibility
+@media (prefers-reduced-motion: reduce) {
+  .card--winning {
+    animation: none;
+    filter: brightness(1.05) drop-shadow(0 0 8px rgba(255, 215, 0, 0.6));
+    
+    .card__front {
+      &::before {
+        animation: none;
+        background: rgba(255, 215, 0, 0.2);
+      }
+      
+      &::after {
+        animation: none;
+        transform: rotate(0deg) scale(1);
+      }
+    }
+    
+    &:hover {
+      transform: translateY(-3px);
+    }
+  }
+}

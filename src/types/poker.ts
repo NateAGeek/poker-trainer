@@ -125,4 +125,5 @@ export interface HandEvaluation {
   ranking: HandRanking;
   description: string;
   cards: Card[];
+  winningCards?: Card[]; // The specific cards that create the winning hand
 }

@@ -1,3 +1,5 @@
+import './DealerChip.scss';
+
 interface DealerChipProps {
   visible?: boolean;
 }

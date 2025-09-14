@@ -1,11 +1,12 @@
-import { Hand } from './Hand';
-import { PlayerHand } from './PlayerHand';
-import { PlayerCountSelector } from './PlayerCountSelector';
-import { GameTabs } from './GameTabs';
-import { useGameDisplay, useGameStatus } from '../hooks/useGameDisplay';
-import { useGameControls } from '../hooks/useGameActions';
-import { useAIAutomation } from '../hooks/useAIAutomation';
+import { Hand } from '../Hand/Hand';
+import { PlayerHand } from '../PlayerHand/PlayerHand';
+import { PlayerCountSelector } from '../PlayerCountSelector';
+import { GameTabs } from '../GameTabs/GameTabs';
+import { useGameDisplay, useGameStatus } from '../../hooks/useGameDisplay';
+import { useGameControls } from '../../hooks/useGameActions';
+import { useAIAutomation } from '../../hooks/useAIAutomation';
 import { useRef, useEffect, useState, useCallback } from 'react';
+import "./PokerGame.scss";
 
 export function PokerGame() {
   // Custom hooks for game state and actions
@@ -125,9 +126,18 @@ export function PokerGame() {
           disabled={!canChangePlayerCount}
         />
         <div className="game-info">
-          <span>Phase: {gameInfo.phase}</span>
-          <span>Pot: ${gameInfo.pot}</span>
-          <span>Dealer: Player {gameState.dealerPosition + 1}</span>
+          <div className="info-item phase-info">
+            <span className="info-label">Phase</span>
+            <span className="info-value">{gameInfo.phase}</span>
+          </div>
+          <div className="info-item pot-info">
+            <span className="info-label">Pot</span>
+            <span className="info-value">${gameInfo.pot}</span>
+          </div>
+          <div className="info-item dealer-info">
+            <span className="info-label">Dealer</span>
+            <span className="info-value">P{gameState.dealerPosition + 1}</span>
+          </div>
         </div>
       </div>
 
@@ -180,42 +190,6 @@ export function PokerGame() {
                 </div>
               );
             })}
-
-            {/* Show empty seats for visual reference when table isn't full */}
-            {/* {gameState.players.length < 9 && (() => {
-              // Calculate how many empty seats to show (up to 6, but at least fill to minimum visual table)
-              const playersCount = gameState.players.length;
-              const maxTableSize = 9; // Maximum poker table size
-              const emptySeatsToShow = Math.min(6, maxTableSize - playersCount);
-              
-              return Array.from({ length: emptySeatsToShow }, (_, i) => {
-                // Create a virtual player index for empty seats
-                const virtualPlayerIndex = playersCount + i;
-                const totalVirtualPlayers = playersCount + emptySeatsToShow;
-                const seatIndex = getSeatIndex(virtualPlayerIndex, totalVirtualPlayers);
-                const position = playerPositions.get(seatIndex);
-                
-                return (
-                  <div 
-                    key={`empty-${i}`} 
-                    className="player-seat"
-                    data-seat={seatIndex}
-                    style={position ? {
-                      position: 'absolute',
-                      left: `${position.x}px`,
-                      top: `${position.y}px`,
-                      transform: 'translate(-50%, -50%)'
-                    } : {}}
-                  >
-                    <div className="player-content">
-                      <div className="empty-seat">
-                        Empty
-                      </div>
-                    </div>
-                  </div>
-                );
-              });
-            })()} */}
           </div>
         </div>
 

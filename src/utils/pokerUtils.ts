@@ -119,7 +119,8 @@ function evaluateFiveCardHand(hand: Card[]): HandEvaluation {
     return {
       ranking: HandRanking.ROYAL_FLUSH,
       description: 'Royal Flush',
-      cards: hand
+      cards: hand,
+      winningCards: hand // All cards contribute to royal flush
     };
   }
 
@@ -128,25 +129,33 @@ function evaluateFiveCardHand(hand: Card[]): HandEvaluation {
     return {
       ranking: HandRanking.STRAIGHT_FLUSH,
       description: 'Straight Flush',
-      cards: hand
+      cards: hand,
+      winningCards: hand // All cards contribute to straight flush
     };
   }
 
   // Four of a Kind
   if (counts[0] === 4) {
+    const fourOfAKindRank = Array.from(rankCounts.entries()).find(([, count]) => count === 4)?.[0];
+    const winningCards = hand.filter(card => card.rank === fourOfAKindRank);
     return {
       ranking: HandRanking.FOUR_OF_A_KIND,
       description: 'Four of a Kind',
-      cards: hand
+      cards: hand,
+      winningCards
     };
   }
 
   // Full House
   if (counts[0] === 3 && counts[1] === 2) {
+    const threeOfAKindRank = Array.from(rankCounts.entries()).find(([, count]) => count === 3)?.[0];
+    const pairRank = Array.from(rankCounts.entries()).find(([, count]) => count === 2)?.[0];
+    const winningCards = hand.filter(card => card.rank === threeOfAKindRank || card.rank === pairRank);
     return {
       ranking: HandRanking.FULL_HOUSE,
       description: 'Full House',
-      cards: hand
+      cards: hand,
+      winningCards
     };
   }
 
@@ -155,7 +164,8 @@ function evaluateFiveCardHand(hand: Card[]): HandEvaluation {
     return {
       ranking: HandRanking.FLUSH,
       description: 'Flush',
-      cards: hand
+      cards: hand,
+      winningCards: hand // All cards contribute to flush
     };
   }
 
@@ -164,42 +174,59 @@ function evaluateFiveCardHand(hand: Card[]): HandEvaluation {
     return {
       ranking: HandRanking.STRAIGHT,
       description: 'Straight',
-      cards: hand
+      cards: hand,
+      winningCards: hand // All cards contribute to straight
     };
   }
 
   // Three of a Kind
   if (counts[0] === 3) {
+    const threeOfAKindRank = Array.from(rankCounts.entries()).find(([, count]) => count === 3)?.[0];
+    const winningCards = hand.filter(card => card.rank === threeOfAKindRank);
     return {
       ranking: HandRanking.THREE_OF_A_KIND,
       description: 'Three of a Kind',
-      cards: hand
+      cards: hand,
+      winningCards
     };
   }
 
   // Two Pair
   if (counts[0] === 2 && counts[1] === 2) {
+    const pairRanks = Array.from(rankCounts.entries())
+      .filter(([, count]) => count === 2)
+      .map(([rank]) => rank);
+    const winningCards = hand.filter(card => pairRanks.includes(card.rank));
     return {
       ranking: HandRanking.TWO_PAIR,
       description: 'Two Pair',
-      cards: hand
+      cards: hand,
+      winningCards
     };
   }
 
   // Pair
   if (counts[0] === 2) {
+    const pairRank = Array.from(rankCounts.entries()).find(([, count]) => count === 2)?.[0];
+    const winningCards = hand.filter(card => card.rank === pairRank);
     return {
       ranking: HandRanking.PAIR,
       description: 'Pair',
-      cards: hand
+      cards: hand,
+      winningCards
     };
   }
 
-  // High Card
+  // High Card - just the highest card
+  const highestCard = hand.reduce((highest, card) => 
+    getRankValue(card.rank) > getRankValue(highest.rank) ? card : highest
+  );
+  
   return {
     ranking: HandRanking.HIGH_CARD,
     description: 'High Card',
-    cards: hand
+    cards: hand,
+    winningCards: [highestCard]
   };
 }
 

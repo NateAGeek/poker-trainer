@@ -1,0 +1,398 @@
+// =========================================
+// Player Hand Component - Modern Design
+// =========================================
+
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.player-hand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-3;
+  padding: $spacing-4;
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: $border-radius-xl;
+  box-shadow: $shadow-lg;
+  transition: all $transition-fast;
+  min-width: 120px;
+  color: $color-white;
+  
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-3;
+    gap: $spacing-2;
+    min-width: 100px;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-lg, 0 8px 25px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  
+  // Position dealer chip in corner
+  .dealer-chip {
+    position: absolute;
+    top: -12px;
+    right: -12px;
+    z-index: 20;
+    
+    @media (max-width: $breakpoint-md) {
+      top: -8px;
+      right: -8px;
+    }
+  }
+}
+
+// =========================================
+// PLAYER STATES
+// =========================================
+
+.player-hand--current {
+  border-color: rgba($color-accent, 0.8);
+  background: rgba(0, 0, 0, 0.7);
+  box-shadow: 
+    $shadow-lg,
+    0 0 0 2px rgba($color-accent, 0.3),
+    0 0 20px rgba($color-accent, 0.2);
+  
+  .current-player-indicator {
+    color: $color-accent;
+    animation: pulse 2s infinite;
+  }
+}
+
+.player-hand--main {
+  border-color: rgba(34, 197, 94, 0.6);
+  background: rgba(0, 0, 0, 0.65);
+  
+  .position-badge {
+    background: linear-gradient(135deg, #22c55e, #16a34a) !important;
+    color: $color-white !important;
+  }
+}
+
+.player-hand--folded {
+  opacity: 0.5;
+  filter: grayscale(50%);
+  
+  .player-cards .card {
+    filter: grayscale(100%) brightness(0.7);
+  }
+}
+
+.player-hand--all-in {
+  border-color: rgba(239, 68, 68, 0.8);
+  background: rgba(239, 68, 68, 0.1);
+  
+  .chip-count {
+    color: #ef4444;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// =========================================
+// PLAYER STATUS INDICATORS
+// =========================================
+
+.player-status {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  
+  .last-action {
+    background: rgba(255, 255, 255, 0.9);
+    color: $color-gray-800;
+    padding: 2px $spacing-2;
+    border-radius: $border-radius-sm;
+    font-size: 10px;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    
+    &--fold {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+      color: $color-white;
+    }
+    
+    &--check {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: $color-white;
+    }
+    
+    &--call {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: $color-white;
+    }
+    
+    &--bet, &--raise {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: $color-white;
+    }
+    
+    &--all_in {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      color: $color-white;
+      animation: pulse 1s infinite;
+    }
+  }
+  
+  .status-indicator {
+    background: rgba(0, 0, 0, 0.8);
+    color: $color-white;
+    padding: 2px $spacing-2;
+    border-radius: $border-radius-sm;
+    font-size: 10px;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    &--all-in {
+      background: linear-gradient(135deg, #ef4444, #dc2626);
+      animation: pulse 1s infinite;
+    }
+    
+    &--folded {
+      background: linear-gradient(135deg, #6b7280, #4b5563);
+    }
+  }
+}
+
+// =========================================
+// PLAYER INFO
+// =========================================
+
+.player-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-2;
+  text-align: center;
+  width: 100%;
+}
+
+.player-name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-1;
+  
+  .player-actual-name {
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $color-white;
+    
+    @media (max-width: $breakpoint-md) {
+      font-size: $font-size-xs;
+    }
+  }
+  
+  .current-player-indicator {
+    color: $color-accent;
+    font-size: $font-size-lg;
+    margin-left: $spacing-1;
+  }
+}
+
+.position-badge {
+  background: linear-gradient(135deg, #6b7280, #4b5563);
+  color: $color-white;
+  padding: 2px $spacing-2;
+  border-radius: $border-radius-sm;
+  font-size: 10px;
+  font-weight: $font-weight-bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 2px;
+  
+  &--dealer {
+    background: linear-gradient(135deg, $color-accent, darken($color-accent, 10%));
+    color: $color-black;
+  }
+  
+  &--blinds {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: $color-white;
+  }
+  
+  &--early {
+    background: linear-gradient(135deg, #f97316, #ea580c);
+    color: $color-white;
+  }
+  
+  &--middle {
+    background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+    color: $color-white;
+  }
+  
+  &--late {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: $color-white;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: 8px;
+    padding: 1px $spacing-1;
+  }
+}
+
+.player-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  width: 100%;
+}
+
+.chip-count {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-xs;
+  color: #ffd700;
+  font-weight: $font-weight-semibold;
+  font-family: $font-family-mono;
+  
+  .chip-icon {
+    font-size: 12px;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: 10px;
+  }
+}
+
+.current-bet {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  background: rgba(59, 130, 246, 0.2);
+  color: #60a5fa;
+  padding: 2px $spacing-2;
+  border-radius: $border-radius-sm;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  font-family: $font-family-mono;
+  
+  .bet-label {
+    opacity: 0.8;
+  }
+  
+  .bet-amount {
+    font-weight: $font-weight-bold;
+  }
+}
+
+.total-bet {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.7);
+  font-family: $font-family-mono;
+  
+  .total-label {
+    opacity: 0.6;
+  }
+  
+  .total-amount {
+    font-weight: $font-weight-medium;
+  }
+}
+
+// =========================================
+// PLAYER CARDS
+// =========================================
+
+.player-cards {
+  display: flex;
+  gap: $spacing-1;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: $breakpoint-md) {
+    gap: 2px;
+  }
+}
+
+.no-cards {
+  display: flex;
+  gap: $spacing-1;
+  
+  .card-placeholder {
+    width: 40px;
+    height: 56px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px dashed rgba(255, 255, 255, 0.3);
+    border-radius: $border-radius-sm;
+    
+    @media (max-width: $breakpoint-md) {
+      width: 32px;
+      height: 44px;
+    }
+  }
+}
+
+// =========================================
+// HAND RANK DISPLAY
+// =========================================
+
+.hand-rank {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  border-radius: $border-radius-base;
+  padding: 4px $spacing-2;
+  text-align: center;
+  max-width: 100%;
+  
+  .hand-rank-icon {
+    font-size: 12px;
+  }
+  
+  .hand-rank-text {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: 9px;
+    padding: 2px $spacing-1;
+    
+    .hand-rank-icon {
+      font-size: 10px;
+    }
+  }
+}
+
+// =========================================
+// ANIMATIONS
+// =========================================
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

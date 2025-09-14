@@ -1,5 +1,5 @@
 import { GameProvider } from './contexts/GameContext'
-import { PokerGame } from './components/PokerGame'
+import { PokerGame } from './components/PokerGame/PokerGame'
 import './styles/app.scss'
 
 function App() {

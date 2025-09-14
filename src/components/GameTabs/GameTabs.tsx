@@ -1,16 +1,22 @@
 import { Tab, Tabs, TabList, TabPanel } from 'react-tabs';
-import { BettingInterface } from './BettingInterface';
-import { useGameStatus, useWinnerCalculation } from '../hooks/useGameDisplay';
-import { usePlayerActions, useGameControls } from '../hooks/useGameActions';
-import { useGameContext } from '../hooks/useGameContext';
+import { BettingInterface } from '../BettingInterface/BettingInterface';
+import { useGameStatus, useWinnerCalculation } from '../../hooks/useGameDisplay';
+import { usePlayerActions, useGameControls } from '../../hooks/useGameActions';
+import { useGameContext } from '../../hooks/useGameContext';
+import { PlayerAction } from '../../types/poker';
 import 'react-tabs/style/react-tabs.css';
+import "./GameTabs.scss";
 
 export function GameTabs() {
   const { gameState, showdown } = useGameContext();
   const { gameInfo } = useGameStatus();
   const { winner, allPlayerEvaluations } = useWinnerCalculation();
-  const { getAvailableActions, handlePlayerAction } = usePlayerActions();
+  const { handlePlayerAction } = usePlayerActions();
   const { resetGame } = useGameControls();
+
+  const handleBettingAction = (action: string, amount?: number) => {
+    handlePlayerAction(action as PlayerAction, amount);
+  };
 
   return (
     <div className="game-tabs-container">
@@ -24,12 +30,10 @@ export function GameTabs() {
             <span className="tab-icon">📊</span>
             <span className="tab-label">GTO Stats</span>
           </Tab>
-          {showdown && (
-            <Tab className="tab" selectedClassName="tab--selected">
-              <span className="tab-icon">🏆</span>
-              <span className="tab-label">Results</span>
-            </Tab>
-          )}
+          <Tab className="tab" selectedClassName="tab--selected" disabled={!showdown}>
+            <span className="tab-icon">🏆</span>
+            <span className="tab-label">Results</span>
+          </Tab>
           <Tab className="tab" selectedClassName="tab--selected">
             <span className="tab-icon">📋</span>
             <span className="tab-label">History</span>
@@ -41,13 +45,7 @@ export function GameTabs() {
           <div className="game-controls">
             {gameState.waitingForPlayerAction && !showdown ? (
               <BettingInterface
-                availableActions={getAvailableActions(gameState.players[0])}
-                currentBet={Math.max(...gameState.players.map(p => p.currentBet))}
-                minRaise={gameState.bettingRound.minRaise}
-                maxBet={gameState.players[0].chips}
-                playerChips={gameState.players[0].chips}
-                potSize={gameState.pot}
-                onAction={handlePlayerAction}
+                onAction={handleBettingAction}
               />
             ) : !showdown ? (
               <div className="ai-action-indicator">
@@ -127,34 +125,58 @@ export function GameTabs() {
           </div>
         </TabPanel>
 
-        {/* Results Tab (only visible during showdown) */}
-        {showdown && (
-          <TabPanel className="tab-panel">
-            <div className="hand-evaluations">
-              <h3>Hand Results</h3>
-              <div className="evaluations-list">
-                {allPlayerEvaluations
-                  .sort((a, b) => b.evaluation.ranking - a.evaluation.ranking)
-                  .map(({ player, evaluation }, index) => (
-                    <div key={player.id} className={`evaluation ${index === 0 ? 'winner' : ''}`}>
-                      <div className="evaluation-header">
-                        <h4>{player.name}</h4>
-                        {index === 0 && <span className="winner-badge">🏆</span>}
+        {/* Results Tab (always visible, content changes based on showdown) */}
+        <TabPanel className="tab-panel">
+          <div className="hand-evaluations">
+            {showdown ? (
+              <>
+                <h3>Hand Results</h3>
+                <div className="evaluations-list">
+                  {allPlayerEvaluations
+                    .sort((a, b) => b.evaluation.ranking - a.evaluation.ranking)
+                    .map(({ player, evaluation }, index) => (
+                      <div key={player.id} className={`evaluation ${index === 0 ? 'winner' : ''}`}>
+                        <div className="evaluation-header">
+                          <h4>{player.name}</h4>
+                          {index === 0 && <span className="winner-badge">🏆</span>}
+                        </div>
+                        <p className="hand-description">{evaluation.description}</p>
+                        <div className="evaluation-cards">
+                          {evaluation.cards.slice(0, 5).map((card, cardIndex) => (
+                            <span key={cardIndex} className="eval-card">
+                              {card.rank}{card.suit}
+                            </span>
+                          ))}
+                        </div>
                       </div>
-                      <p className="hand-description">{evaluation.description}</p>
-                      <div className="evaluation-cards">
-                        {evaluation.cards.slice(0, 5).map((card, cardIndex) => (
-                          <span key={cardIndex} className="eval-card">
-                            {card.rank}{card.suit}
-                          </span>
-                        ))}
-                      </div>
+                    ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <h3>Results</h3>
+                <div className="no-results">
+                  <div className="no-results-icon">🏆</div>
+                  <p>Hand results will appear here when the hand is complete.</p>
+                  <div className="current-hand-info">
+                    <div className="info-item">
+                      <span className="label">Hand #:</span>
+                      <span className="value">{gameState.handNumber}</span>
                     </div>
-                  ))}
-              </div>
-            </div>
-          </TabPanel>
-        )}
+                    <div className="info-item">
+                      <span className="label">Phase:</span>
+                      <span className="value">{gameInfo.phase}</span>
+                    </div>
+                    <div className="info-item">
+                      <span className="label">Pot:</span>
+                      <span className="value">${gameState.pot}</span>
+                    </div>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </TabPanel>
 
         {/* History Tab */}
         <TabPanel className="tab-panel">

@@ -1,0 +1,613 @@
+// =========================================
+// Poker Game Component - Table Layout
+// =========================================
+
+@use '../../styles/variables' as *;
+@use '../../styles/mixins' as *;
+
+.poker-game {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: $spacing-4;
+  
+  @media (max-width: $breakpoint-sidebar-collapse) {
+    padding: $spacing-2;
+  }
+}
+
+// =========================================
+// GAME HEADER STYLES
+// =========================================
+
+.game-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, rgba(15, 81, 50, 0.95) 0%, rgba(10, 54, 34, 0.98) 100%);
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $border-radius-2xl;
+  padding: $spacing-3 $spacing-6;
+  margin-bottom: $spacing-6;
+  color: $color-white;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  
+  // Subtle gradient overlay for premium feel
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
+    z-index: 1;
+  }
+  
+  h1 {
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    margin: 0;
+    color: $color-white;
+    letter-spacing: $letter-spacing-wide;
+    font-family: $font-family-sans;
+    position: relative;
+    z-index: 2;
+    
+    // Subtle text glow effect
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  }
+  
+  // Player Count Selector in header
+  .player-count-selector {
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.4);
+    padding: $spacing-2 $spacing-4;
+    border-radius: $border-radius-xl;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    
+    label {
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      color: $color-white;
+      letter-spacing: $letter-spacing-wide;
+      text-transform: uppercase;
+      margin: 0;
+      white-space: nowrap;
+    }
+    
+    select {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid rgba(0, 0, 0, 0.2);
+      color: $color-gray-800;
+      padding: $spacing-2 $spacing-4;
+      border-radius: $border-radius-lg;
+      font-size: $font-size-sm;
+      font-weight: $font-weight-semibold;
+      font-family: $font-family-sans;
+      min-width: 180px;
+      cursor: pointer;
+      transition: $transition-colors;
+      
+      // Custom arrow styling
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right $spacing-3 center;
+      background-size: 16px;
+      padding-right: $spacing-8;
+      
+      &:hover:not(:disabled) {
+        background: $color-white;
+        border-color: rgba(0, 0, 0, 0.3);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: $color-primary;
+        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
+        background: $color-white;
+      }
+      
+      &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        background: rgba(255, 255, 255, 0.5);
+      }
+      
+      option {
+        background: $color-white;
+        color: $color-gray-800;
+        padding: $spacing-2;
+        font-weight: $font-weight-medium;
+      }
+    }
+  }
+  
+  .game-info {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+    position: relative;
+    z-index: 2;
+    background: rgba(0, 0, 0, 0.4);
+    padding: $spacing-3 $spacing-4;
+    border-radius: $border-radius-xl;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-1;
+      padding: $spacing-2 $spacing-3;
+      border-radius: $border-radius-lg;
+      transition: $transition-colors;
+      min-width: 80px;
+      
+      .info-label {
+        font-size: $font-size-xs;
+        color: rgba(255, 255, 255, 0.7);
+        text-transform: uppercase;
+        letter-spacing: $letter-spacing-wider;
+        font-weight: $font-weight-semibold;
+        line-height: 1;
+      }
+      
+      .info-value {
+        font-family: $font-family-mono;
+        font-weight: $font-weight-bold;
+        font-size: $font-size-base;
+        color: $color-white;
+        line-height: 1;
+        text-align: center;
+      }
+      
+      // Special styling for pot display
+      &.pot-info {
+        .info-value {
+          color: #ffd700;
+          text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+          font-size: $font-size-lg;
+        }
+        
+        .info-label {
+          color: rgba(255, 215, 0, 0.8);
+        }
+      }
+      
+      // Special styling for dealer position
+      &.dealer-info {
+        .info-value {
+          color: #ff6b6b;
+          font-size: $font-size-lg;
+        }
+        
+        .info-label {
+          color: rgba(255, 107, 107, 0.8);
+        }
+      }
+      
+      // Special styling for phase
+      &.phase-info {
+        .info-value {
+          color: #4ade80;
+          font-size: $font-size-base;
+          text-transform: capitalize;
+        }
+        
+        .info-label {
+          color: rgba(74, 222, 128, 0.8);
+        }
+      }
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.05);
+        transform: translateY(-1px);
+      }
+    }
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    flex-direction: column;
+    gap: $spacing-4;
+    padding: $spacing-4;
+    
+    h1 {
+      font-size: $font-size-xl;
+      text-align: center;
+    }
+    
+    .player-count-selector {
+      flex-direction: column;
+      gap: $spacing-2;
+      align-self: stretch;
+      
+      select {
+        min-width: auto;
+        width: 100%;
+      }
+    }
+    
+    .game-info {
+      justify-content: center;
+      gap: $spacing-3;
+      align-self: stretch;
+      
+      .info-item {
+        flex: 1;
+        min-width: 70px;
+        
+        .info-label {
+          font-size: 10px;
+        }
+        
+        .info-value {
+          font-size: $font-size-sm;
+        }
+        
+        &.pot-info .info-value {
+          font-size: $font-size-base;
+        }
+        
+        &.dealer-info .info-value {
+          font-size: $font-size-base;
+        }
+      }
+    }
+  }
+  
+  @media (max-width: $breakpoint-sm) {
+    margin-bottom: $spacing-4;
+    gap: $spacing-3;
+    
+    h1 {
+      font-size: $font-size-lg;
+    }
+    
+    .player-count-selector {
+      padding: $spacing-2 $spacing-3;
+      
+      label {
+        font-size: $font-size-xs;
+      }
+      
+      select {
+        font-size: $font-size-xs;
+        padding: $spacing-1 $spacing-3;
+      }
+    }
+    
+    .game-info {
+      gap: $spacing-2;
+      padding: $spacing-2 $spacing-3;
+      
+      .info-item {
+        min-width: 60px;
+        padding: $spacing-1;
+        
+        .info-label {
+          font-size: 9px;
+        }
+        
+        .info-value {
+          font-size: $font-size-xs;
+        }
+        
+        &.pot-info .info-value,
+        &.dealer-info .info-value {
+          font-size: $font-size-sm;
+        }
+      }
+    }
+  }
+}
+
+// =========================================
+// MAIN GAME LAYOUT
+// =========================================
+
+.game-layout {
+  display: flex;
+  gap: $spacing-6;
+  flex: 1;
+  height: calc(100vh - 160px); // Account for header with better calculation
+  min-height: 500px;
+  
+  @media (max-width: $breakpoint-sidebar-collapse) {
+    flex-direction: column;
+    gap: $spacing-4;
+    height: auto;
+  }
+}
+
+.game-board-column {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4;
+  
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-3;
+  }
+  
+  @media (max-width: $breakpoint-sidebar-collapse) {
+    min-height: 400px;
+    padding: $spacing-2;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.controls-stats-column {
+  background: rgba(0, 0, 0, 0.4);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $border-radius-xl;
+  padding: $spacing-4;
+  box-shadow: $shadow-lg;
+  
+  @media (max-width: $breakpoint-sidebar-collapse) {
+    width: 100%;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+}
+
+// =========================================
+// POKER TABLE
+// =========================================
+
+.game-board {
+  position: relative;
+  width: 80%;
+  height: 70%;
+  aspect-ratio: 16 / 11;
+  margin: 0 auto;
+  
+  // Table felt surface
+  background: 
+    radial-gradient(ellipse at center, $color-felt-green-light 0%, $color-felt-green 70%, $color-felt-green-dark 100%);
+  
+  // Table shape and border
+  border-radius: $table-border-radius;
+  border: $table-border-width solid $color-table-border;
+  box-shadow: $shadow-table;
+  
+  // Table rail
+  &::before {
+    content: '';
+    position: absolute;
+    top: -($table-border-width + $table-rail-width);
+    left: -($table-border-width + $table-rail-width);
+    right: -($table-border-width + $table-rail-width);
+    bottom: -($table-border-width + $table-rail-width);
+    background: linear-gradient(145deg, lighten($color-table-rail, 10%) 0%, $color-table-rail 50%, darken($color-table-rail, 15%) 100%);
+    border-radius: $table-border-radius + $table-rail-width;
+    z-index: -1;
+    box-shadow: 
+      inset 0 4px 8px rgba(0, 0, 0, 0.3),
+      0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+  
+  // Table felt texture
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: $table-border-radius;
+    background-image: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 1px,
+        rgba(255, 255, 255, 0.03) 1px,
+        rgba(255, 255, 255, 0.03) 2px
+      );
+    pointer-events: none;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    width: 98%;
+    height: 85%;
+  }
+  
+  @media (max-width: $breakpoint-sidebar-collapse) {
+    width: 100%;
+    height: 80%;
+  }
+}
+
+// =========================================
+// PLAYER POSITIONS
+// =========================================
+
+.player-seat {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: all;
+  z-index: 10;
+  
+  .player-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    transform: scale(0.9) !important;
+  }
+  
+  @media (max-width: $breakpoint-sidebar-collapse) {
+    transform: scale(0.8) !important;
+  }
+}
+
+// =========================================
+// COMMUNITY AREA
+// =========================================
+
+.poker-table-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-4;
+  
+  @media (max-width: $breakpoint-md) {
+    width: 70%;
+    height: 60%;
+    gap: $spacing-3;
+  }
+}
+
+.community-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-3;
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: $border-radius-xl;
+  padding: $spacing-4;
+  box-shadow: $shadow-lg;
+  
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-3;
+    gap: $spacing-2;
+  }
+}
+
+.community-cards {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-3;
+  
+  // Style the individual cards within community
+  .card {
+    transition: all $transition-fast;
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  // Flop cards (first 3) - closer together
+  .card:nth-child(1),
+  .card:nth-child(2),
+  .card:nth-child(3) {
+    margin-right: $spacing-1;
+  }
+  
+  // Turn card (4th) - add space before it
+  .card:nth-child(4) {
+    margin-left: $spacing-3;
+    margin-right: $spacing-1;
+  }
+  
+  // River card (5th) - add space before it
+  .card:nth-child(5) {
+    margin-left: $spacing-3;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    gap: $spacing-2;
+    
+    .card:nth-child(1),
+    .card:nth-child(2),
+    .card:nth-child(3) {
+      margin-right: 2px;
+    }
+    
+    .card:nth-child(4) {
+      margin-left: $spacing-2;
+      margin-right: 2px;
+    }
+    
+    .card:nth-child(5) {
+      margin-left: $spacing-2;
+    }
+  }
+}
+
+.pot-display {
+  background: 
+    radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 50%, transparent 100%),
+    rgba(0, 0, 0, 0.4);
+  border: 3px solid rgba(255, 215, 0, 0.6);
+  border-radius: $border-radius-full;
+  width: 80px;
+  height: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $color-white;
+  font-family: $font-family-mono;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 215, 0, 0.2);
+  
+  .pot-label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .pot-amount {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    margin-top: $spacing-1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    width: 60px;
+    height: 60px;
+    
+    .pot-amount {
+      font-size: $font-size-base;
+    }
+    
+    .pot-label {
+      font-size: 10px;
+    }
+  }
+}

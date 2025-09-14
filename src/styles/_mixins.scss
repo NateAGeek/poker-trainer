@@ -1,0 +1,385 @@
+// =========================================
+// Mixins - Reusable Style Patterns
+// Poker GTO Trainer
+// =========================================
+
+@use 'variables' as *;
+
+// =========================================
+// RESPONSIVE BREAKPOINTS
+// =========================================
+
+@mixin mobile {
+  @media (max-width: #{$breakpoint-sm - 1px}) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $breakpoint-sm) and (max-width: #{$breakpoint-lg - 1px}) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+@mixin large-desktop {
+  @media (min-width: $breakpoint-xl) {
+    @content;
+  }
+}
+
+@mixin extra-large-desktop {
+  @media (min-width: $breakpoint-2xl) {
+    @content;
+  }
+}
+
+// =========================================
+// LAYOUT MIXINS
+// =========================================
+
+@mixin full-size {
+  width: 100%;
+  height: 100%;
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin absolute-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+@mixin absolute-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+// =========================================
+// CARD MIXINS
+// =========================================
+
+@mixin playing-card {
+  width: $card-width;
+  height: $card-height;
+  border-radius: $card-border-radius;
+  border: $card-border-width solid $color-gray-300;
+  background: $color-card-background;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: $spacing-2;
+  box-shadow: $shadow-md;
+  transition: $transition-all;
+  
+  @include mobile {
+    width: $card-width-mobile;
+    height: $card-height-mobile;
+    padding: $spacing-1;
+  }
+  
+  @include large-desktop {
+    width: $card-width-desktop;
+    height: $card-height-desktop;
+    padding: $spacing-3;
+  }
+}
+
+@mixin card-base {
+  background: rgba($color-white, 0.95);
+  border: 2px solid rgba($color-gray-300, 0.6);
+  border-radius: $border-radius-xl;
+  box-shadow: $shadow-lg;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@mixin card-shadow {
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 1px 3px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+// =========================================
+// GLASS EFFECT MIXINS
+// =========================================
+
+@mixin glass-effect($opacity: 0.9) {
+  background: rgba($color-white, $opacity);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba($color-white, 0.2);
+}
+
+@mixin glass-card {
+  @include glass-effect(0.1);
+  border-radius: $border-radius-xl;
+  padding: $spacing-6;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+// =========================================
+// ANIMATION MIXINS
+// =========================================
+
+@mixin fade-in($duration: $transition-duration-300) {
+  animation: fadeIn $duration $transition-timing-ease-in-out;
+}
+
+@mixin slide-up($duration: $transition-duration-300) {
+  animation: slideUp $duration $transition-timing-ease-out;
+}
+
+@mixin pulse-animation($color: $color-secondary) {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  
+  @keyframes pulse {
+    0%, 100% {
+      box-shadow: 0 0 0 0 rgba($color, 0.7);
+    }
+    50% {
+      box-shadow: 0 0 0 10px rgba($color, 0);
+    }
+  }
+}
+
+@mixin hover-lift {
+  transition: $transition-transform;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@mixin blink {
+  animation: blink 1s linear infinite;
+  
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+}
+
+// =========================================
+// VISUAL EFFECT MIXINS
+// =========================================
+
+@mixin glow-effect($color: $color-secondary, $intensity: 0.5) {
+  box-shadow: 
+    0 0 5px rgba($color, $intensity),
+    0 0 10px rgba($color, $intensity * 0.8),
+    0 0 15px rgba($color, $intensity * 0.6),
+    0 0 20px rgba($color, $intensity * 0.4);
+}
+
+@mixin text-glow($color: $color-secondary) {
+  text-shadow: 
+    0 0 5px rgba($color, 0.5),
+    0 0 10px rgba($color, 0.3),
+    0 0 15px rgba($color, 0.2);
+}
+
+@mixin text-shadow($color: rgba(0, 0, 0, 0.3)) {
+  text-shadow: 1px 1px 2px $color;
+}
+
+@mixin text-monospace {
+  font-family: $font-family-mono;
+  font-variant-numeric: tabular-nums;
+}
+
+// =========================================
+// BEM METHODOLOGY MIXINS
+// =========================================
+
+@mixin element($element) {
+  &__#{$element} {
+    @content;
+  }
+}
+
+@mixin modifier($modifier) {
+  &--#{$modifier} {
+    @content;
+  }
+}
+
+@mixin state($state) {
+  &.is-#{$state},
+  &:#{$state} {
+    @content;
+  }
+}
+
+// =========================================
+// BUTTON MIXINS
+// =========================================
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3 $spacing-6;
+  border: none;
+  border-radius: $border-radius-lg;
+  font-size: $font-size-base;
+  font-weight: $font-weight-medium;
+  text-decoration: none;
+  cursor: pointer;
+  transition: $transition-all;
+  white-space: nowrap;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+@mixin button-primary {
+  @include button-base;
+  background: $gradient-secondary;
+  color: $color-white;
+  box-shadow: $shadow-md;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: $shadow-lg;
+    @include glow-effect($color-secondary, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin button-secondary {
+  @include button-base;
+  background: transparent;
+  color: $color-secondary;
+  border: 2px solid $color-secondary;
+  
+  &:hover:not(:disabled) {
+    background: $color-secondary;
+    color: $color-white;
+  }
+}
+
+// =========================================
+// UTILITY MIXINS
+// =========================================
+
+@mixin sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@mixin clearfix {
+  &::after {
+    content: '';
+    display: table;
+    clear: both;
+  }
+}
+
+@mixin truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@mixin line-clamp($lines) {
+  display: -webkit-box;
+  -webkit-line-clamp: $lines;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+// =========================================
+// KEYFRAME ANIMATIONS
+// =========================================
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

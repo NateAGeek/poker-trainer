@@ -1,0 +1,302 @@
+// =========================================
+// Poker Game Component - Table Layout
+// =========================================
+
+@use '../variables' as *;
+@use '../mixins' as *;
+
+.poker-game {
+  width: 100%;
+  height: 100%;
+  min-height: 100vh;
+  display: flex;
+  gap: $spacing-6;
+  padding: $spacing-4;
+  
+  @media (max-width: $breakpoint-sidebar-collapse) {
+    flex-direction: column;
+    gap: $spacing-4;
+    padding: $spacing-2;
+  }
+}
+
+// =========================================
+// POKER TABLE
+// =========================================
+
+.poker-table-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 600px;
+  padding: $spacing-8;
+  
+  @media (max-width: $breakpoint-md) {
+    padding: $spacing-4;
+    min-height: 500px;
+  }
+}
+
+.poker-table {
+  position: relative;
+  width: $table-width;
+  height: $table-height;
+  max-width: 90vw;
+  max-height: 70vh;
+  
+  // Table felt surface
+  background: 
+    radial-gradient(ellipse at center, $color-felt-green-light 0%, $color-felt-green 70%, $color-felt-green-dark 100%);
+  
+  // Table shape and border
+  border-radius: $table-border-radius;
+  border: $table-border-width solid $color-table-border;
+  box-shadow: $shadow-table;
+  
+  // Table rail
+  &::before {
+    content: '';
+    position: absolute;
+    top: -($table-border-width + $table-rail-width);
+    left: -($table-border-width + $table-rail-width);
+    right: -($table-border-width + $table-rail-width);
+    bottom: -($table-border-width + $table-rail-width);
+    background: linear-gradient(145deg, lighten($color-table-rail, 10%) 0%, $color-table-rail 50%, darken($color-table-rail, 15%) 100%);
+    border-radius: $table-border-radius + $table-rail-width;
+    z-index: -1;
+    box-shadow: 
+      inset 0 4px 8px rgba(0, 0, 0, 0.3),
+      0 20px 40px rgba(0, 0, 0, 0.4);
+  }
+  
+  // Table felt texture
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: $table-border-radius;
+    background-image: 
+      repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 1px,
+        rgba(255, 255, 255, 0.03) 1px,
+        rgba(255, 255, 255, 0.03) 2px
+      );
+    pointer-events: none;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    width: min(90vw, $table-width * 0.8);
+    height: min(60vh, $table-height * 0.8);
+  }
+}
+
+// =========================================
+// PLAYER POSITIONS
+// =========================================
+
+.player-positions {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+}
+
+.player-seat {
+  position: absolute;
+  width: $player-seat-size;
+  height: $player-seat-size;
+  pointer-events: all;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  // Position players around the table ellipse
+  &[data-seat="0"] { // Dealer position (bottom)
+    bottom: -($player-seat-size / 2);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  &[data-seat="1"] { // Bottom right
+    bottom: 10%;
+    right: 15%;
+  }
+  
+  &[data-seat="2"] { // Right
+    top: 50%;
+    right: -($player-seat-size / 2);
+    transform: translateY(-50%);
+  }
+  
+  &[data-seat="3"] { // Top right
+    top: 10%;
+    right: 15%;
+  }
+  
+  &[data-seat="4"] { // Top
+    top: -($player-seat-size / 2);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  &[data-seat="5"] { // Top left
+    top: 10%;
+    left: 15%;
+  }
+  
+  &[data-seat="6"] { // Left
+    top: 50%;
+    left: -($player-seat-size / 2);
+    transform: translateY(-50%);
+  }
+  
+  &[data-seat="7"] { // Bottom left
+    bottom: 10%;
+    left: 15%;
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    width: $player-seat-size * 0.8;
+    height: $player-seat-size * 0.8;
+    
+    &[data-seat="0"] { bottom: -($player-seat-size * 0.4); }
+    &[data-seat="2"] { right: -($player-seat-size * 0.4); }
+    &[data-seat="4"] { top: -($player-seat-size * 0.4); }
+    &[data-seat="6"] { left: -($player-seat-size * 0.4); }
+  }
+}
+
+// =========================================
+// COMMUNITY AREA
+// =========================================
+
+.community-area {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: $community-area-width;
+  height: $community-area-height;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: $spacing-4;
+  
+  @media (max-width: $breakpoint-md) {
+    width: $community-area-width * 0.8;
+    height: $community-area-height * 0.8;
+    gap: $spacing-3;
+  }
+}
+
+.community-cards {
+  display: flex;
+  gap: $spacing-2;
+  align-items: center;
+  justify-content: center;
+  
+  @media (max-width: $breakpoint-md) {
+    gap: $spacing-1;
+  }
+}
+
+.pot-display {
+  background: 
+    radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 50%, transparent 100%),
+    rgba(0, 0, 0, 0.4);
+  border: 3px solid rgba(255, 215, 0, 0.6);
+  border-radius: $border-radius-full;
+  width: $pot-display-size;
+  height: $pot-display-size;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: $color-white;
+  font-family: $font-family-mono;
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.3),
+    inset 0 2px 4px rgba(255, 215, 0, 0.2);
+  
+  .pot-label {
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    opacity: 0.9;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .pot-amount {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    margin-top: $spacing-1;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    width: $pot-display-size * 0.8;
+    height: $pot-display-size * 0.8;
+    
+    .pot-amount {
+      font-size: $font-size-base;
+    }
+    
+    .pot-label {
+      font-size: 10px;
+    }
+  }
+}
+
+// =========================================
+// GAME HEADER
+// =========================================
+
+.game-header {
+  position: absolute;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: $border-radius-xl;
+  padding: $spacing-4 $spacing-8;
+  color: $color-white;
+  text-align: center;
+  box-shadow: $shadow-lg;
+  
+  h1 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    margin: 0;
+    color: $color-accent;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    top: -60px;
+    padding: $spacing-3 $spacing-6;
+    
+    h1 {
+      font-size: $font-size-lg;
+    }
+  }
+  
+  @media (max-width: $breakpoint-sidebar-collapse) {
+    position: static;
+    transform: none;
+    margin-bottom: $spacing-4;
+  }
+}

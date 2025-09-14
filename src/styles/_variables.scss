@@ -1,0 +1,227 @@
+// =========================================
+// Variables - Poker Table Design System
+// =========================================
+
+// =========================================
+// POKER TABLE COLORS
+// =========================================
+
+// Table Colors - Realistic Casino Feel
+$color-felt-green: #0F5132;
+$color-felt-green-light: #198754;
+$color-felt-green-dark: #0A3622;
+$color-table-border: #8B4513;
+$color-table-rail: #654321;
+$color-table-shadow: rgba(0, 0, 0, 0.3);
+
+// Card Colors
+$color-card-background: #ffffff;
+$color-card-back: #1e3a8a;
+$color-card-red: #dc2626;
+$color-card-black: #1f2937;
+$color-card-shadow: rgba(0, 0, 0, 0.25);
+
+// UI Colors
+$color-primary: #1e40af;
+$color-primary-light: #3b82f6;
+$color-primary-dark: #1e3a8a;
+$color-secondary: #dc2626;
+$color-secondary-light: #ef4444;
+$color-secondary-dark: #b91c1c;
+$color-accent: #f59e0b;
+$color-success: #16a34a;
+$color-success-light: #22c55e;
+$color-success-dark: #15803d;
+$color-warning: #ea580c;
+$color-warning-dark: #c2410c;
+$color-danger: #dc2626;
+$color-danger-light: #fca5a5;
+$color-info: #0ea5e9;
+$color-info-dark: #0284c7;
+
+// Neutral Colors
+$color-white: #ffffff;
+$color-black: #000000;
+$color-black-200: #1f2937;
+$color-gray-50: #f9fafb;
+$color-gray-100: #f3f4f6;
+$color-gray-200: #e5e7eb;
+$color-gray-300: #d1d5db;
+$color-gray-400: #9ca3af;
+$color-gray-500: #6b7280;
+$color-gray-600: #4b5563;
+$color-gray-700: #374151;
+$color-gray-800: #1f2937;
+$color-gray-900: #111827;
+
+// Sidebar Colors
+$color-sidebar-bg: rgba(255, 255, 255, 0.95);
+$color-sidebar-border: rgba(0, 0, 0, 0.1);
+$color-tab-active: #1e40af;
+$color-tab-inactive: #6b7280;
+
+// =========================================
+// GRADIENTS
+// =========================================
+
+// Background Gradients
+$gradient-primary: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+$gradient-secondary: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+$gradient-felt: radial-gradient(ellipse at center, $color-felt-green-light 0%, $color-felt-green  50%, $color-felt-green-dark 100%);
+$gradient-card: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+
+// =========================================
+// POKER TABLE DIMENSIONS
+// =========================================
+
+// Table Layout
+$table-width: 800px;
+$table-height: 500px;
+$table-border-radius: 250px;
+$table-border-width: 12px;
+$table-rail-width: 40px;
+$game-max-width: 1400px;
+
+// Player Positioning
+$player-position-radius: 220px;
+$player-seat-size: 120px;
+$player-seat-gap: 20px;
+
+// Community Cards Area
+$community-area-width: 300px;
+$community-area-height: 120px;
+$pot-display-size: 100px;
+$pot-border-width: 2px;
+$pot-size: 150px;
+
+// Sidebar
+$sidebar-width: 400px;
+$sidebar-min-width: 350px;
+
+// =========================================
+// CARD DIMENSIONS
+// =========================================
+
+$card-width: 52px;
+$card-height: 72px;
+$card-border-radius: 6px;
+$card-border-width: 1px;
+
+// Responsive Card Sizes
+$card-width-small: 44px;
+$card-height-small: 61px;
+$card-width-large: 60px;
+$card-height-large: 84px;
+
+// =========================================
+// SPACING SYSTEM
+// =========================================
+$spacing-0: 0;
+$spacing-1: 0.25rem;    // 4px
+$spacing-2: 0.5rem;     // 8px
+$spacing-3: 0.75rem;    // 12px
+$spacing-4: 1rem;       // 16px
+$spacing-5: 1.25rem;    // 20px
+$spacing-6: 1.5rem;     // 24px
+$spacing-7: 1.75rem;    // 28px
+$spacing-8: 2rem;       // 32px
+$spacing-10: 2.5rem;    // 40px
+$spacing-12: 3rem;      // 48px
+$spacing-16: 4rem;      // 64px
+
+// =========================================
+// TYPOGRAPHY
+// =========================================
+
+$font-family-sans: 'Inter', system-ui, -apple-system, sans-serif;
+$font-family-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+$font-size-xs: 0.75rem;    // 12px
+$font-size-sm: 0.875rem;   // 14px
+$font-size-base: 1rem;     // 16px
+$font-size-md: 1rem;       // 16px (alias for base)
+$font-size-lg: 1.125rem;   // 18px
+$font-size-xl: 1.25rem;    // 20px
+$font-size-2xl: 1.5rem;    // 24px
+$font-size-3xl: 1.875rem;  // 30px
+$font-size-4xl: 2.25rem;   // 36px
+
+$font-weight-light: 300;
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-semibold: 600;
+$font-weight-bold: 700;
+
+$line-height-tight: 1.25;
+$line-height-normal: 1.5;
+$line-height-relaxed: 1.75;
+
+$letter-spacing-tighter: -0.05em;
+$letter-spacing-tight: -0.025em;
+$letter-spacing-normal: 0;
+$letter-spacing-wide: 0.025em;
+$letter-spacing-wider: 0.05em;
+$letter-spacing-widest: 0.1em;
+
+// =========================================
+// BORDER RADIUS
+// =========================================
+$border-radius-sm: 0.125rem;   // 2px
+$border-radius-base: 0.25rem;  // 4px
+$border-radius-md: 0.375rem;   // 6px
+$border-radius-lg: 0.5rem;     // 8px
+$border-radius-xl: 0.75rem;    // 12px
+$border-radius-2xl: 1rem;      // 16px
+$border-radius-full: 9999px;
+
+// =========================================
+// SHADOWS
+// =========================================
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+// Table specific shadows
+$shadow-table: 0 20px 40px rgba(0, 0, 0, 0.3), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+$shadow-card: 0 2px 8px rgba(0, 0, 0, 0.15), 0 1px 3px rgba(0, 0, 0, 0.2);
+$shadow-player: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+// =========================================
+// TRANSITIONS
+// =========================================
+$transition-duration-300: 300ms;
+$transition-timing-ease-in-out: ease-in-out;
+$transition-timing-ease-out: ease-out;
+$transition-fast: 150ms ease-in-out;
+$transition-base: 250ms ease-in-out;
+$transition-slow: 350ms ease-in-out;
+
+$transition-all: all $transition-base;
+$transition-transform: transform $transition-fast;
+$transition-opacity: opacity $transition-base;
+$transition-colors: color $transition-base, background-color $transition-base, border-color $transition-base;
+
+// =========================================
+// BREAKPOINTS
+// =========================================
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// Responsive table breakpoints
+$breakpoint-table-compact: 1200px;
+$breakpoint-sidebar-collapse: 1024px;
+
+// =========================================
+// Z-INDEX SCALE
+// =========================================
+$z-index-table: 1;
+$z-index-cards: 10;
+$z-index-players: 20;
+$z-index-sidebar: 30;
+$z-index-modal: 1000;
+$z-index-tooltip: 1100;

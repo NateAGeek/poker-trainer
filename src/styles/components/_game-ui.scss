@@ -1,0 +1,273 @@
+// =========================================
+// GTO Stats & Game Tabs Components (BEM)
+// =========================================
+
+@use '../variables' as *;
+@use '../mixins' as *;
+
+// GTO Statistics Section
+.gto-stats {
+  @include glass-effect(0.8);
+  border-radius: $border-radius-2xl;
+  @include card-shadow;
+  padding: $spacing-8;
+  
+  @include mobile {
+    padding: $spacing-6;
+  }
+  
+  @include large-desktop {
+    padding: $spacing-10;
+  }
+  
+  @include element('title') {
+    margin: 0 0 $spacing-6 0;
+    color: $color-secondary;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    text-align: center;
+    border-bottom: 1px solid rgba($color-secondary, 0.3);
+    padding-bottom: $spacing-4;
+  }
+  
+  @include element('content') {
+    @include flex-column;
+    gap: $spacing-6;
+  }
+  
+  @include element('item') {
+    @include flex-column;
+    gap: $spacing-1;
+  }
+  
+  @include element('label') {
+    font-size: $font-size-base;
+    color: $color-gray-800;
+    font-weight: $font-weight-medium;
+  }
+  
+  @include element('value') {
+    font-size: $font-size-lg;
+    color: $color-secondary;
+    font-weight: $font-weight-semibold;
+  }
+  
+  @include element('action-evs') {
+    @include flex-column;
+    gap: $spacing-1;
+    margin-left: $spacing-4;
+    
+    div {
+      font-size: $font-size-base;
+      color: $color-info;
+      font-weight: $font-weight-medium;
+    }
+  }
+}
+
+// Hand Evaluations Section
+.hand-evaluations {
+  @include glass-effect(0.8);
+  border-radius: $border-radius-2xl;
+  @include card-shadow;
+  padding: $spacing-8;
+  
+  @include mobile {
+    padding: $spacing-6;
+  }
+  
+  @include large-desktop {
+    padding: $spacing-10;
+  }
+  
+  @include element('title') {
+    margin: 0 0 $spacing-6 0;
+    color: $color-secondary;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-semibold;
+    text-align: center;
+    border-bottom: 1px solid rgba($color-secondary, 0.3);
+    padding-bottom: $spacing-4;
+  }
+  
+  @include element('evaluation') {
+    @include glass-effect(0.3);
+    padding: $spacing-6;
+    border-radius: $border-radius-xl;
+    margin-bottom: $spacing-6;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+    
+    h4 {
+      margin: 0 0 $spacing-4 0;
+      color: $color-secondary;
+      font-size: $font-size-lg;
+    }
+    
+    p {
+      margin: 0;
+      font-size: $font-size-base;
+      font-weight: $font-weight-medium;
+      color: $color-gray-900;
+    }
+  }
+}
+
+// Game Tabs Component
+.game-tabs {
+  @include glass-effect(0.9);
+  border-radius: $border-radius-2xl;
+  padding: $spacing-8;
+  @include card-shadow;
+  
+  @include mobile {
+    padding: $spacing-6;
+  }
+  
+  @include element('header') {
+    @include flex-between;
+    margin-bottom: $spacing-8;
+    
+    @include mobile {
+      @include flex-column;
+      gap: $spacing-4;
+      align-items: center;
+    }
+  }
+  
+  @include element('title') {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    color: $color-secondary;
+    @include text-glow($color-secondary);
+    margin: 0;
+    
+    @include mobile {
+      font-size: $font-size-2xl;
+    }
+  }
+  
+  @include element('nav') {
+    display: flex;
+    gap: $spacing-2;
+    background: $color-black-200;
+    border-radius: $border-radius-lg;
+    padding: $spacing-2;
+    
+    @include mobile {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+  }
+  
+  @include element('tab') {
+    padding: $spacing-4 $spacing-6;
+    border: none;
+    background: transparent;
+    color: $color-gray-700;
+    border-radius: $border-radius-base;
+    cursor: pointer;
+    transition: $transition-all;
+    font-weight: $font-weight-medium;
+    font-size: $font-size-base;
+    
+    @include mobile {
+      padding: $spacing-3 $spacing-4;
+      font-size: $font-size-sm;
+    }
+    
+    &:hover {
+      background: $color-gray-200;
+      color: $color-white;
+    }
+    
+    @include state('active') {
+      background: $color-secondary;
+      color: $color-black;
+      font-weight: $font-weight-semibold;
+      @include glow-effect($color-secondary, 0.3);
+    }
+  }
+  
+  @include element('content') {
+    @include fade-in;
+  }
+}
+
+// Player Count Selector
+.player-count-selector {
+  @include glass-effect(0.8);
+  border-radius: $border-radius-xl;
+  padding: $spacing-6;
+  @include card-shadow;
+  
+  @include element('label') {
+    display: block;
+    margin-bottom: $spacing-4;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $color-secondary;
+    text-align: center;
+  }
+  
+  @include element('options') {
+    display: flex;
+    gap: $spacing-3;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  @include element('option') {
+    padding: $spacing-3 $spacing-5;
+    border: 2px solid $color-gray-400;
+    background: transparent;
+    color: $color-gray-700;
+    border-radius: $border-radius-base;
+    cursor: pointer;
+    transition: $transition-all;
+    font-weight: $font-weight-medium;
+    min-width: 50px;
+    
+    &:hover {
+      border-color: $color-secondary;
+      color: $color-white;
+      background: rgba($color-secondary, 0.1);
+    }
+    
+    @include state('active') {
+      border-color: $color-secondary;
+      background: $color-secondary;
+      color: $color-black;
+      font-weight: $font-weight-semibold;
+    }
+  }
+}
+
+// Dealer Chip
+.dealer-chip {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, $color-secondary 0%, $color-secondary-dark 100%);
+  border: 3px solid $color-white;
+  border-radius: $border-radius-full;
+  @include flex-center;
+  color: $color-black;
+  font-weight: $font-weight-bold;
+  font-size: $font-size-sm;
+  box-shadow: $shadow-lg;
+  @include text-shadow;
+  
+  @include mobile {
+    width: 30px;
+    height: 30px;
+    font-size: $font-size-xs;
+  }
+  
+  @include large-desktop {
+    width: 50px;
+    height: 50px;
+    font-size: $font-size-base;
+  }
+}

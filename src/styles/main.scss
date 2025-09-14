@@ -1,0 +1,18 @@
+// =========================================
+// Main SCSS Entry Point
+// Poker GTO Trainer
+// =========================================
+
+// Base styles
+@use 'variables';
+@use 'mixins';
+@use 'base';
+
+// Component styles
+@use 'components/poker-game';
+@use 'components/sidebar';
+@use 'components/betting-interface';
+@use 'components/card';
+@use 'components/player-hand';
+@use 'components/hand';
+@use 'components/game-ui';

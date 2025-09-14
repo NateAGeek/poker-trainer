@@ -1,0 +1,12 @@
+// =========================================
+// App Component Styles
+// =========================================
+
+@use 'variables' as *;
+@use 'mixins' as *;
+
+.app {
+  @include full-size;
+  @include flex-column;
+  background: $gradient-primary;
+}

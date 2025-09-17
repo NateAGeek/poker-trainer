@@ -179,14 +179,26 @@
       
       // Special styling for pot display
       &.pot-info {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: $border-radius-xl;
+        transition: all 0.2s ease;
+        
         .info-value {
-          color: #ffd700;
-          text-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+          color: #ffffff;
           font-size: $font-size-lg;
+          font-weight: $font-weight-bold;
         }
         
         .info-label {
-          color: rgba(255, 215, 0, 0.8);
+          color: rgba(255, 255, 255, 0.7);
+          font-weight: $font-weight-medium;
+        }
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          border-color: rgba(255, 255, 255, 0.25);
+          transform: translateY(-1px);
         }
       }
       
@@ -565,49 +577,107 @@
 
 .pot-display {
   background: 
-    radial-gradient(circle, rgba(255, 215, 0, 0.2) 0%, rgba(255, 215, 0, 0.1) 50%, transparent 100%),
-    rgba(0, 0, 0, 0.4);
-  border: 3px solid rgba(255, 215, 0, 0.6);
-  border-radius: $border-radius-full;
-  width: 80px;
-  height: 80px;
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.04) 100%),
+    rgba(0, 0, 0, 0.3);
+  
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: $border-radius-2xl;
+  width: 100px;
+  height: 100px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   color: $color-white;
-  font-family: $font-family-mono;
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
+  font-family: $font-family-sans;
+  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(16px);
   box-shadow: 
-    0 4px 16px rgba(0, 0, 0, 0.3),
-    inset 0 2px 4px rgba(255, 215, 0, 0.2);
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  
+  transition: all 0.2s ease;
   
   .pot-label {
     font-size: $font-size-xs;
     font-weight: $font-weight-medium;
-    opacity: 0.9;
+    opacity: 0.7;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 4px;
   }
   
   .pot-amount {
-    font-size: $font-size-lg;
+    font-size: $font-size-xl;
     font-weight: $font-weight-bold;
-    margin-top: $spacing-1;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    color: #ffffff;
+    line-height: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 85px;
+    transition: all 0.3s ease;
+  }
+  
+  // Subtle hover effects
+  &:hover {
+    border-color: rgba(255, 255, 255, 0.25);
+    box-shadow: 
+      0 6px 20px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    
+    .pot-label {
+      opacity: 0.9;
+    }
+  }
+  
+  // Clean animation for pot value changes
+  .pot-amount.updating {
+    animation: pot-update-clean 0.4s ease-out;
   }
   
   @media (max-width: $breakpoint-md) {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     
     .pot-amount {
-      font-size: $font-size-base;
+      font-size: $font-size-lg;
+      max-width: 70px;
     }
     
     .pot-label {
       font-size: 10px;
     }
+  }
+  
+  @media (max-width: $breakpoint-sm) {
+    width: 70px;
+    height: 70px;
+    
+    .pot-amount {
+      font-size: $font-size-base;
+      max-width: 60px;
+    }
+    
+    .pot-label {
+      font-size: 9px;
+    }
+  }
+}
+
+// Keyframe animations
+@keyframes pot-update-clean {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
   }
 }

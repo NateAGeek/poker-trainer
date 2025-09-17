@@ -37,7 +37,9 @@ export const PlayerAction = {
   CALL: 'call',
   BET: 'bet',
   RAISE: 'raise',
-  ALL_IN: 'all_in'
+  ALL_IN: 'all_in',
+  SMALL_BLIND: 'small_blind',
+  BIG_BLIND: 'big_blind'
 } as const;
 
 export type PlayerAction = typeof PlayerAction[keyof typeof PlayerAction];

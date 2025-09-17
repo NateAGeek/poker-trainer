@@ -1,0 +1,133 @@
+// =========================================
+// Pot Geometry Component - Pot & Stack Analysis
+// =========================================
+
+@use '../../../../styles/variables' as *;
+@use '../../../../styles/mixins' as *;
+
+.pot-geometry {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $border-radius-md;
+  padding: $spacing-4;
+  margin-bottom: $spacing-4;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  h4 {
+    margin: 0 0 $spacing-3 0;
+    color: $color-white;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    text-transform: uppercase;
+    letter-spacing: $letter-spacing-wide;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    padding-bottom: $spacing-2;
+  }
+
+  .geometry-stats {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: $spacing-4;
+    justify-content: space-between;
+
+    @media (max-width: $breakpoint-md) {
+      flex-direction: column;
+      gap: $spacing-2;
+    }
+  }
+
+  .stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-1;
+    padding: $spacing-2;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: $border-radius-sm;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+
+    label {
+      display: flex;
+      align-items: center;
+      gap: $spacing-1;
+      font-size: $font-size-xs;
+      color: rgba(255, 255, 255, 0.7);
+      font-weight: $font-weight-medium;
+      margin: 0;
+    }
+
+    .stat-value {
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      color: $color-white;
+      font-family: $font-family-mono;
+    }
+  }
+
+  // Pot value styling
+  .pot-value {
+    color: $color-success;
+  }
+
+  // Stack value styling
+  .stack-value {
+    color: $color-info;
+  }
+
+  // SPR value styling with color coding
+  .spr-value {
+    &.spr-very-low {
+      color: $color-danger; // Red for very low SPR (< 1)
+    }
+
+    &.spr-low {
+      color: $color-warning; // Orange for low SPR (1-5)
+    }
+
+    &.spr-medium {
+      color: $color-success; // Green for medium SPR (5-20)
+    }
+
+    &.spr-high {
+      color: $color-info; // Blue for high SPR (> 20)
+    }
+  }
+
+  // Bet size value styling
+  .bet-size-value {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-1;
+
+    .bet-amount {
+      color: $color-white;
+    }
+
+    .bet-percent {
+      font-size: $font-size-xs;
+      color: rgba(255, 255, 255, 0.6);
+      font-weight: $font-weight-normal;
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-3;
+
+    .stat-item {
+      .stat-value {
+        font-size: $font-size-sm;
+      }
+    }
+
+    .bet-size-value {
+      .bet-percent {
+        font-size: 10px;
+      }
+    }
+  }
+}

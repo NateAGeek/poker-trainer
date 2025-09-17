@@ -5,7 +5,8 @@ import { GameTabs } from '../GameTabs/GameTabs';
 import { useGameDisplay, useGameStatus } from '../../hooks/useGameDisplay';
 import { useGameControls } from '../../hooks/useGameActions';
 import { useAIAutomation } from '../../hooks/useAIAutomation';
-import { useRef, useEffect, useState, useCallback } from 'react';
+import { useRef, useEffect, useState, useCallback, useMemo } from 'react';
+import { calculateCurrentPotSize } from '../../utils/potGeometryUtils';
 import "./PokerGame.scss";
 
 export function PokerGame() {
@@ -13,6 +14,33 @@ export function PokerGame() {
   const { gameState, visibleCommunityCards, showdown, getSeatIndex } = useGameDisplay();
   const { gameInfo, playerCount, canChangePlayerCount } = useGameStatus();
   const { initializeNewGame } = useGameControls();
+  
+  // Calculate real-time pot size including current bets
+  const currentPotSize = useMemo(() => {
+    return calculateCurrentPotSize(gameState);
+  }, [gameState]);
+  
+  // Format pot amount for display
+  const formatPotAmount = useCallback((amount: number): string => {
+    return `$${amount.toLocaleString()}`;
+  }, []);
+  
+  // Animation for pot value changes
+  const [isUpdating, setIsUpdating] = useState(false);
+  const [prevPotSize, setPrevPotSize] = useState(currentPotSize);
+  
+  useEffect(() => {
+    if (currentPotSize !== prevPotSize) {
+      setIsUpdating(true);
+      setPrevPotSize(currentPotSize);
+      
+      const timer = setTimeout(() => {
+        setIsUpdating(false);
+      }, 600);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [currentPotSize, prevPotSize]);
   
   // Table measurement for dynamic positioning
   const tableBoardRef = useRef<HTMLDivElement>(null);
@@ -155,7 +183,9 @@ export function PokerGame() {
               </div>
               <div className="pot-display">
                 <div className="pot-label">Pot</div>
-                <div className="pot-amount">${gameState.pot}</div>
+                <div className={`pot-amount ${isUpdating ? 'updating' : ''}`}>
+                  {formatPotAmount(currentPotSize)}
+                </div>
               </div>
             </div>
 

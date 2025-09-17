@@ -243,6 +243,71 @@
   }
 }
 
+.last-action {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 10px;
+  color: $color-gray-600;
+  margin: 2px 0;
+  
+  .action-label {
+    font-size: 9px;
+    opacity: 0.7;
+  }
+  
+  .action-value {
+    font-weight: $font-weight-bold;
+    padding: 1px 4px;
+    border-radius: 2px;
+    font-size: 9px;
+    
+    &--fold {
+      color: #ff4444;
+      background-color: rgba(255, 68, 68, 0.1);
+    }
+    
+    &--check {
+      color: #44aa44;
+      background-color: rgba(68, 170, 68, 0.1);
+    }
+    
+    &--call {
+      color: #4488aa;
+      background-color: rgba(68, 136, 170, 0.1);
+    }
+    
+    &--bet, &--raise {
+      color: #aa4444;
+      background-color: rgba(170, 68, 68, 0.1);
+    }
+    
+    &--all_in {
+      color: #aa44aa;
+      background-color: rgba(170, 68, 170, 0.1);
+      font-weight: $font-weight-bold;
+    }
+    
+    &--small_blind, &--big_blind {
+      color: #888888;
+      background-color: rgba(136, 136, 136, 0.1);
+      font-style: italic;
+    }
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    font-size: 8px;
+    
+    .action-label {
+      font-size: 7px;
+    }
+    
+    .action-value {
+      font-size: 8px;
+    }
+  }
+}
+
 .player-stats {
   display: flex;
   flex-direction: column;

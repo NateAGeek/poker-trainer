@@ -1,0 +1,80 @@
+// =========================================
+// GTO Stats Tab Component - Strategy Analysis
+// =========================================
+
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.gto-stats-tab {
+  h3 {
+    margin: 0 0 $spacing-4 0;
+    color: $color-white;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: $spacing-3;
+  }
+
+  .stats-content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+  
+  .stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-3;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: $border-radius-md;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    label {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: $font-weight-medium;
+      font-size: $font-size-sm;
+      display: flex;
+      align-items: center;
+    }
+    
+    .stat-value {
+      color: $color-white;
+      font-weight: $font-weight-semibold;
+      font-family: $font-family-mono;
+      
+      &.optimal-action {
+        color: $color-accent;
+        text-transform: uppercase;
+        font-weight: $font-weight-bold;
+      }
+    }
+  }
+  
+  .action-evs {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-2;
+    margin-top: $spacing-2;
+    
+    .ev-item {
+      display: flex;
+      justify-content: space-between;
+      padding: $spacing-2;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: $border-radius-sm;
+      
+      .action-name {
+        color: rgba(255, 255, 255, 0.7);
+        font-size: $font-size-sm;
+      }
+      
+      .ev-value {
+        color: $color-accent;
+        font-family: $font-family-mono;
+        font-weight: $font-weight-semibold;
+      }
+    }
+  }
+}

@@ -82,6 +82,26 @@ export function PlayerHand({
           )}
         </div>
         
+        {/* Last Action Display for Visual Debugging */}
+        {player.lastAction && (
+          <div className="last-action">
+            <span className="action-label">Last:</span>
+            <span className={`action-value action-value--${player.lastAction}`}>
+              {player.lastAction.toUpperCase()}
+            </span>
+          </div>
+        )}
+        
+        {/* Debug: Show all-in status */}
+        {player.isAllIn && (
+          <div className="last-action">
+            <span className="action-label">Status:</span>
+            <span className="action-value action-value--all_in">
+              ALL-IN
+            </span>
+          </div>
+        )}
+        
         <div className="player-stats">
           <div className="chip-count">
             <span className="chip-icon">🪙</span>

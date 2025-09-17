@@ -57,7 +57,8 @@ export function postBlinds(players: Player[], smallBlindPos: number, bigBlindPos
         chips: player.chips - betAmount,
         currentBet: betAmount,
         totalBetThisRound: betAmount,
-        isAllIn: betAmount === player.chips + betAmount
+        isAllIn: player.chips - betAmount === 0,
+        lastAction: Action.SMALL_BLIND
       };
     } else if (index === bigBlindPos) {
       const betAmount = Math.min(bigBlind, player.chips);
@@ -66,7 +67,8 @@ export function postBlinds(players: Player[], smallBlindPos: number, bigBlindPos
         chips: player.chips - betAmount,
         currentBet: betAmount,
         totalBetThisRound: betAmount,
-        isAllIn: betAmount === player.chips + betAmount
+        isAllIn: player.chips - betAmount === 0,
+        lastAction: Action.BIG_BLIND
       };
     }
     return {
@@ -76,7 +78,7 @@ export function postBlinds(players: Player[], smallBlindPos: number, bigBlindPos
     };
   });
   
-  const pot = players[smallBlindPos].currentBet + players[bigBlindPos].currentBet;
+  const pot = updatedPlayers[smallBlindPos].currentBet + updatedPlayers[bigBlindPos].currentBet;
   return { players: updatedPlayers, pot };
 }
 

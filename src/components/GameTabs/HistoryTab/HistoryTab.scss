@@ -1,0 +1,100 @@
+// =========================================
+// History Tab Component - Game History
+// =========================================
+
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.history-tab {
+  h3 {
+    margin: 0 0 $spacing-4 0;
+    color: $color-white;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: $spacing-3;
+  }
+
+  h4 {
+    margin: 0 0 $spacing-2 0;
+    color: $color-accent;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+  }
+
+  .history-content {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-4;
+  }
+  
+  .history-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-3;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: $border-radius-md;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    label {
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: $font-weight-medium;
+      font-size: $font-size-sm;
+    }
+    
+    span {
+      color: $color-white;
+      font-weight: $font-weight-semibold;
+      font-family: $font-family-mono;
+    }
+  }
+  
+  .recent-actions {
+    margin-top: $spacing-4;
+    
+    h4 {
+      margin-bottom: $spacing-3;
+      padding-bottom: $spacing-2;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .action-list {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-2;
+    }
+    
+    .action-entry {
+      display: flex;
+      align-items: center;
+      gap: $spacing-3;
+      padding: $spacing-2 $spacing-3;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: $border-radius-sm;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      
+      .player-name {
+        color: $color-accent;
+        font-weight: $font-weight-semibold;
+        font-size: $font-size-sm;
+        min-width: 80px;
+      }
+      
+      .action {
+        color: rgba(255, 255, 255, 0.9);
+        font-weight: $font-weight-medium;
+        text-transform: capitalize;
+        flex: 1;
+      }
+      
+      .bet-amount {
+        color: #22c55e;
+        font-family: $font-family-mono;
+        font-weight: $font-weight-bold;
+        font-size: $font-size-sm;
+      }
+    }
+  }
+}

@@ -2,6 +2,7 @@ import { useMemo } from 'react';
 import type { Player } from '../types/poker';
 import { useGameContext } from './useGameContext';
 import { evaluateHand, getRankValue } from '../utils/pokerUtils';
+import { calculateCurrentPotSize } from '../utils/potGeometryUtils';
 
 /**
  * Hook for accessing and computing display-related game state
@@ -159,7 +160,7 @@ export function useGameStatus() {
 
   const gameInfo = useMemo(() => ({
     phase: gameState.gamePhase.toUpperCase(),
-    pot: gameState.pot,
+    pot: calculateCurrentPotSize(gameState), // Use real-time pot calculation
     currentPlayerName: gameState.players[gameState.currentPlayer]?.name || 'Unknown',
     isWaitingForPlayer: gameState.waitingForPlayerAction,
     handNumber: gameState.handNumber

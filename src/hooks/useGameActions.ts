@@ -106,7 +106,19 @@ export function usePlayerActions() {
       newState.gamePhase = nextPhase;
       
       if (nextPhase === 'showdown') {
-        dispatch({ type: 'SET_SHOWDOWN', payload: { showdown: true } });
+        // Update waiting state for showdown
+        newState.waitingForPlayerAction = false;
+        
+        // Use the combined action to update game state and set showdown atomically
+        dispatch({ 
+          type: 'UPDATE_GAME_STATE_AND_SHOWDOWN', 
+          payload: { 
+            gameState: newState,
+            showdown: true
+          } 
+        });
+        
+        return; // Early return to avoid duplicate dispatch
       } else {
         // Set up next betting round
         dispatch({ type: 'REVEAL_COMMUNITY_CARDS', payload: { count: getCardsForPhase(nextPhase) } });

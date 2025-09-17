@@ -283,3 +283,80 @@ export function evaluateHand(cards: Card[]): HandEvaluation {
 
   return bestHand!;
 }
+
+// Calculate hand strength as a percentage (0-100)
+// This gives a relative strength of the hand based on ranking and high cards
+export function calculateHandStrength(cards: Card[]): { strength: number; explanation: string } {
+  if (cards.length < 2) {
+    return { 
+      strength: 0, 
+      explanation: "Insufficient cards to calculate hand strength" 
+    };
+  }
+
+  const evaluation = evaluateHand(cards);
+  const { ranking, cards: handCards } = evaluation;
+  
+  // Base strength based on hand ranking (out of 10 levels)
+  let baseStrength = 0;
+  let strengthDescription = "";
+  
+  switch (ranking) {
+    case HandRanking.ROYAL_FLUSH:
+      baseStrength = 100;
+      strengthDescription = "Royal Flush - The strongest possible hand";
+      break;
+    case HandRanking.STRAIGHT_FLUSH:
+      baseStrength = 95;
+      strengthDescription = "Straight Flush - Five consecutive cards of the same suit";
+      break;
+    case HandRanking.FOUR_OF_A_KIND:
+      baseStrength = 90;
+      strengthDescription = "Four of a Kind - Four cards of the same rank";
+      break;
+    case HandRanking.FULL_HOUSE:
+      baseStrength = 85;
+      strengthDescription = "Full House - Three of a kind plus a pair";
+      break;
+    case HandRanking.FLUSH:
+      baseStrength = 75;
+      strengthDescription = "Flush - Five cards of the same suit";
+      break;
+    case HandRanking.STRAIGHT:
+      baseStrength = 65;
+      strengthDescription = "Straight - Five consecutive cards";
+      break;
+    case HandRanking.THREE_OF_A_KIND:
+      baseStrength = 55;
+      strengthDescription = "Three of a Kind - Three cards of the same rank";
+      break;
+    case HandRanking.TWO_PAIR:
+      baseStrength = 35;
+      strengthDescription = "Two Pair - Two different pairs";
+      break;
+    case HandRanking.PAIR:
+      baseStrength = 20;
+      strengthDescription = "One Pair - Two cards of the same rank";
+      break;
+    case HandRanking.HIGH_CARD:
+      baseStrength = 5;
+      strengthDescription = "High Card - No pairs or better";
+      break;
+  }
+  
+  // Add kicker strength for more precise calculation
+  if (handCards && handCards.length >= 1) {
+    const highCard = handCards.reduce((highest, card) => 
+      getRankValue(card.rank) > getRankValue(highest.rank) ? card : highest
+    );
+    const kickerBonus = (getRankValue(highCard.rank) - 2) / 12 * 5; // 0-5 bonus based on high card
+    baseStrength = Math.min(100, baseStrength + kickerBonus);
+  }
+  
+  const explanation = `${strengthDescription}. Hand strength is calculated based on poker hand rankings with kicker adjustments. ${evaluation.description} with ${handCards?.map(c => `${c.rank}${c.suit}`).join(', ') || 'cards shown'}.`;
+  
+  return { 
+    strength: Math.round(baseStrength * 10) / 10, // Round to 1 decimal place
+    explanation 
+  };
+}

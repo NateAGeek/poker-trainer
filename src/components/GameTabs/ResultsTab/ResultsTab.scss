@@ -1,0 +1,148 @@
+// =========================================
+// Results Tab Component - Hand Evaluations
+// =========================================
+
+@use '../../../styles/variables' as *;
+@use '../../../styles/mixins' as *;
+
+.results-tab {
+  h3 {
+    margin: 0 0 $spacing-4 0;
+    color: $color-white;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: $spacing-3;
+  }
+
+  h4 {
+    margin: 0 0 $spacing-2 0;
+    color: $color-accent;
+    font-size: $font-size-base;
+    font-weight: $font-weight-semibold;
+  }
+
+  .evaluations-list {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-3;
+  }
+  
+  .evaluation {
+    padding: $spacing-4;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: $border-radius-lg;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all $transition-fast;
+    
+    &.winner {
+      background: rgba(34, 197, 94, 0.1);
+      border-color: rgba(34, 197, 94, 0.3);
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+    }
+    
+    .evaluation-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $spacing-2;
+      
+      h4 {
+        margin: 0;
+        color: $color-white;
+        font-size: $font-size-base;
+      }
+      
+      .winner-badge {
+        font-size: $font-size-lg;
+        animation: bounce 2s infinite;
+      }
+    }
+    
+    .hand-description {
+      color: $color-accent;
+      font-weight: $font-weight-semibold;
+      margin-bottom: $spacing-3;
+      font-size: $font-size-sm;
+    }
+    
+    .evaluation-cards {
+      display: flex;
+      gap: $spacing-2;
+      flex-wrap: wrap;
+      
+      .eval-card {
+        background: rgba(255, 255, 255, 0.1);
+        padding: $spacing-1 $spacing-2;
+        border-radius: $border-radius-sm;
+        font-family: $font-family-mono;
+        font-size: $font-size-xs;
+        color: rgba(255, 255, 255, 0.9);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+    }
+  }
+  
+  // No results state
+  .no-results {
+    text-align: center;
+    padding: $spacing-6;
+    
+    .no-results-icon {
+      font-size: 4rem;
+      margin-bottom: $spacing-4;
+      opacity: 0.3;
+    }
+    
+    p {
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: $spacing-6;
+      font-size: $font-size-sm;
+      line-height: $line-height-relaxed;
+    }
+    
+    .current-hand-info {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-3;
+      max-width: 200px;
+      margin: 0 auto;
+      
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: $spacing-2 $spacing-3;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: $border-radius-md;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        .label {
+          color: rgba(255, 255, 255, 0.7);
+          font-size: $font-size-xs;
+          font-weight: $font-weight-medium;
+        }
+        
+        .value {
+          color: $color-white;
+          font-size: $font-size-xs;
+          font-weight: $font-weight-semibold;
+          font-family: $font-family-mono;
+        }
+      }
+    }
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}

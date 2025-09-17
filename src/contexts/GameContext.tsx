@@ -11,6 +11,7 @@ export type GameAction =
   | { type: 'ADVANCE_GAME_PHASE' }
   | { type: 'REVEAL_COMMUNITY_CARDS'; payload: { count: number } }
   | { type: 'SET_SHOWDOWN'; payload: { showdown: boolean } }
+  | { type: 'UPDATE_GAME_STATE_AND_SHOWDOWN'; payload: { gameState: Partial<GameState>; showdown: boolean } }
   | { type: 'RESET_GAME' }
   | { type: 'UPDATE_GAME_STATE'; payload: Partial<GameState> };
 
@@ -53,6 +54,14 @@ function gameReducer(state: GameContextState, action: GameAction): GameContextSt
       return {
         ...state,
         gameState: { ...state.gameState, ...action.payload },
+      };
+    }
+
+    case 'UPDATE_GAME_STATE_AND_SHOWDOWN': {
+      return {
+        ...state,
+        gameState: { ...state.gameState, ...action.payload.gameState },
+        showdown: action.payload.showdown,
       };
     }
 

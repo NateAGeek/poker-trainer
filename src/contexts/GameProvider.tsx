@@ -1,6 +1,6 @@
 import { useReducer } from 'react';
 import type { GameAction, GameContextState, GameContextType, GameProviderProps } from './GameTypes';
-import { GameContext } from './GameContext';
+import { GameContext } from './gameContext';
 import { initializeGame } from '../services/gameService';
 
 // Initial state

@@ -5,9 +5,9 @@ import { useGameContext } from './useGameContext';
 import { 
   getNextActivePlayer, 
   isBettingRoundComplete,
-  makeAIDecision
-} from '../utils/bettingUtils';
-import { collectBets } from '../utils/potUtils';
+  makeAIDecision,
+  collectBets
+} from '../utils/gameUtils';
 import { getNextGamePhase, getCardsForPhase } from '../services/gameService';
 
 /**
@@ -95,7 +95,7 @@ export function usePlayerActions() {
     }
     
     // Check if betting round is complete
-    if (isBettingRoundComplete(newState.players, newState.bettingRound)) {
+    if (isBettingRoundComplete(newState.players)) {
       // Collect bets and move to next phase
       const { players: updatedPlayers, collectedAmount } = collectBets(newState.players);
       newState.players = updatedPlayers;

@@ -1,0 +1,38 @@
+@use '../../../../styles/variables' as *;
+@use '../shared-stats';
+
+.range-analysis {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+
+  .range-matrix-container {
+    display: flex;
+    justify-content: center;
+    padding: $spacing-4;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: $border-radius-md;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+
+    @media (max-width: $breakpoint-sm) {
+      padding: $spacing-3;
+    }
+  }
+
+  // Range stats inherits from stats-card via class
+  .range-stats {
+    .stat-row {
+      @media (max-width: $breakpoint-md) {
+        .stat-item {
+          flex-direction: row;
+          justify-content: space-between;
+          align-items: center;
+
+          label {
+            margin-bottom: 0;
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,239 @@
+@import '../../styles/variables';
+
+.range-matrix {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+  padding: $spacing-4;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: $border-radius-lg;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+
+  .range-header {
+    text-align: center;
+    margin-bottom: $spacing-4;
+
+    .range-name {
+      margin: 0 0 $spacing-2 0;
+      font-size: $font-size-lg;
+      font-weight: $font-weight-semibold;
+      color: $color-white;
+    }
+
+    .range-description {
+      margin: 0;
+      font-size: $font-size-sm;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: $line-height-relaxed;
+    }
+  }
+
+  .matrix-grid {
+    display: inline-block;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: $border-radius-md;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.03);
+    -webkit-user-select: none;
+    user-select: none; // Prevent text selection during drag
+  }
+
+  .matrix-row {
+    display: flex;
+  }
+
+  .matrix-cell {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    cursor: pointer;
+    transition: $transition-all;
+    position: relative;
+    color: rgba(255, 255, 255, 0.8);
+
+    &:hover {
+      transform: scale(1.1);
+      z-index: 10;
+      box-shadow: $shadow-md;
+      border-color: $color-accent;
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    // Hand type indicators
+    &.pocket-pair {
+      background-color: rgba($color-info, 0.2);
+      border-color: rgba($color-info, 0.4);
+    }
+
+    &.suited {
+      background-color: rgba($color-success, 0.2);
+      border-color: rgba($color-success, 0.4);
+    }
+
+    &.offsuit {
+      background-color: rgba($color-warning, 0.2);
+      border-color: rgba($color-warning, 0.4);
+    }
+
+    // Selection state
+    &.selected {
+      font-weight: $font-weight-bold;
+      border-width: 2px;
+      border-color: $color-accent;
+    }
+
+    // Drag highlight state
+    &.drag-highlighted {
+      background-color: rgba($color-accent, 0.3) !important;
+      border-color: $color-accent !important;
+      transform: scale(1.05);
+      z-index: 5;
+    }
+
+    // Color classes for actions (when not using custom colors)
+    &.raise-color {
+      background-color: rgba($color-danger, 0.8);
+      color: $color-white;
+      border-color: $color-danger;
+    }
+
+    &.call-color {
+      background-color: rgba($color-success, 0.8);
+      color: $color-white;
+      border-color: $color-success;
+    }
+
+    &.fold-color {
+      background-color: rgba($color-gray-500, 0.8);
+      color: $color-white;
+      border-color: $color-gray-500;
+    }
+
+    &.default-color {
+      background-color: rgba($color-primary, 0.8);
+      color: $color-white;
+      border-color: $color-primary;
+    }
+
+    // Frequency opacity modifiers
+    &.high-frequency {
+      opacity: 1;
+    }
+
+    &.medium-frequency {
+      opacity: 0.7;
+    }
+
+    &.low-frequency {
+      opacity: 0.4;
+    }
+
+    .hand-label {
+      font-size: $font-size-xs;
+      line-height: 1;
+    }
+
+    .frequency-label {
+      font-size: 8px;
+      line-height: 1;
+      font-weight: $font-weight-normal;
+      margin-top: 1px;
+    }
+
+    .action-label {
+      font-size: 8px;
+      line-height: 1;
+      font-weight: $font-weight-bold;
+      margin-top: 1px;
+      text-transform: uppercase;
+    }
+  }
+
+  .matrix-legend {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-6;
+    margin-top: $spacing-3;
+    font-size: $font-size-sm;
+    color: rgba(255, 255, 255, 0.7);
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: $border-radius-sm;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      &.pocket-pair-legend {
+        background-color: rgba($color-info, 0.2);
+        border-color: rgba($color-info, 0.4);
+      }
+
+      &.suited-legend {
+        background-color: rgba($color-success, 0.2);
+        border-color: rgba($color-success, 0.4);
+      }
+
+      &.offsuit-legend {
+        background-color: rgba($color-warning, 0.2);
+        border-color: rgba($color-warning, 0.4);
+      }
+    }
+  }
+
+  // Responsive design
+  @media (max-width: $breakpoint-md) {
+    .matrix-cell {
+      width: 28px;
+      height: 28px;
+      font-size: 10px;
+
+      .frequency-label,
+      .action-label {
+        font-size: 7px;
+      }
+    }
+
+    .matrix-legend {
+      gap: $spacing-4;
+      font-size: $font-size-xs;
+
+      .legend-color {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+
+  @media (max-width: $breakpoint-sm) {
+    padding: $spacing-3;
+
+    .matrix-cell {
+      width: 24px;
+      height: 24px;
+      font-size: 9px;
+
+      .frequency-label,
+      .action-label {
+        font-size: 6px;
+      }
+    }
+
+    .matrix-legend {
+      flex-wrap: wrap;
+      gap: $spacing-3;
+    }
+  }
+}

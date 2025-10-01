@@ -1,4 +1,4 @@
-import { GameProvider } from './contexts/GameContext'
+import { GameProvider } from './contexts'
 import { PokerGame } from './components/PokerGame/PokerGame'
 import './styles/app.scss'
 

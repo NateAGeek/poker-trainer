@@ -1,0 +1,211 @@
+@use '../../../../styles/variables' as *;
+@use '../shared-stats';
+
+.range-selector-card {
+  .range-dropdown-container {
+    margin-bottom: $spacing-3;
+
+    .range-dropdown {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: $color-white;
+      padding: $spacing-2 $spacing-3;
+      border-radius: $border-radius-sm;
+      font-size: $font-size-sm;
+      font-family: $font-family-sans;
+      cursor: pointer;
+      transition: $transition-colors;
+
+      &:focus {
+        outline: none;
+        border-color: $color-accent;
+        background: rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 0 2px rgba($color-accent, 0.2);
+      }
+
+      &:hover {
+        border-color: rgba(255, 255, 255, 0.3);
+        background: rgba(255, 255, 255, 0.12);
+      }
+
+      option {
+        background: $color-gray-800;
+        color: $color-white;
+        padding: $spacing-2;
+        border: none;
+
+        &:hover,
+        &:focus {
+          background: $color-gray-700;
+        }
+
+        &:checked {
+          background: $color-accent;
+          color: $color-white;
+        }
+      }
+
+      // Custom arrow styling
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right $spacing-2 center;
+      background-size: 16px;
+      padding-right: $spacing-8;
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: $font-size-xs;
+        padding: $spacing-2;
+        padding-right: $spacing-6;
+        background-size: 14px;
+      }
+    }
+  }
+
+  .custom-range-controls {
+    padding: $spacing-3;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: $border-radius-sm;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    margin-bottom: $spacing-3;
+
+    .custom-status {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: $spacing-3;
+
+      .clear-range-btn {
+        background: rgba($color-danger, 0.8);
+        color: $color-white;
+        border: none;
+        padding: $spacing-1 $spacing-2;
+        border-radius: $border-radius-sm;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: $transition-all;
+
+        &:hover {
+          background: $color-danger;
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        @media (max-width: $breakpoint-sm) {
+          padding: $spacing-1;
+          font-size: 10px;
+        }
+      }
+
+      @media (max-width: $breakpoint-sm) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: $spacing-2;
+      }
+    }
+
+    .instruction-label {
+      color: rgba(255, 255, 255, 0.6) !important;
+      font-style: italic;
+      font-size: $font-size-xs;
+      line-height: $line-height-relaxed;
+      margin: 0;
+
+      @media (max-width: $breakpoint-sm) {
+        font-size: 10px;
+      }
+    }
+  }
+
+  .display-options {
+    display: flex;
+    gap: $spacing-4;
+    flex-wrap: wrap;
+
+    @media (max-width: $breakpoint-md) {
+      flex-direction: column;
+      gap: $spacing-2;
+    }
+
+    .checkbox-item {
+      flex: 1;
+      min-width: 0;
+
+      label {
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        cursor: pointer;
+        -webkit-user-select: none;
+        user-select: none;
+        transition: $transition-colors;
+
+        &:hover {
+          color: rgba(255, 255, 255, 0.9);
+        }
+
+        input[type="checkbox"] {
+          width: 16px;
+          height: 16px;
+          accent-color: $color-accent;
+          cursor: pointer;
+          border-radius: $border-radius-sm;
+          
+          // Custom checkbox styling for better theme integration
+          appearance: none;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.3);
+          position: relative;
+          transition: $transition-all;
+
+          &:checked {
+            background: $color-accent;
+            border-color: $color-accent;
+
+            &::after {
+              content: '✓';
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              color: $color-white;
+              font-size: 10px;
+              font-weight: bold;
+            }
+          }
+
+          &:hover {
+            border-color: rgba(255, 255, 255, 0.5);
+            background: rgba(255, 255, 255, 0.15);
+          }
+
+          &:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px rgba($color-accent, 0.3);
+          }
+
+          @media (max-width: $breakpoint-sm) {
+            width: 14px;
+            height: 14px;
+
+            &::after {
+              font-size: 8px;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive adjustments
+  @media (max-width: $breakpoint-sm) {
+    .stats-content {
+      gap: $spacing-2;
+    }
+  }
+}

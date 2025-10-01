@@ -7,7 +7,7 @@ import {
   postBlinds, 
   getNextActivePlayer,
   AI_PERSONALITIES
-} from '../utils/bettingUtils';
+} from '../utils/gameUtils';
 import { getNextDealerPosition } from '../utils/positionUtils';
 
 /**

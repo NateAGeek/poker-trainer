@@ -1,13 +1,13 @@
 // =========================================
-// Pot Geometry Component - Pot & Stack Analysis
+// Pot Odds & Breakeven Component
 // =========================================
 
 @use '../shared-stats';
 
-.pot-geometry {
+.pot-odds-breakeven {
   @extend .stats-card;
 
-  .geometry-stats {
+  .odds-stats {
     @extend .stats-content;
   }
 }

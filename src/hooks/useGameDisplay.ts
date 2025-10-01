@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { Player } from '../types/poker';
 import { useGameContext } from './useGameContext';
 import { evaluateHand, getRankValue } from '../utils/pokerUtils';
-import { calculateCurrentPotSize } from '../utils/potGeometryUtils';
+import { calculateCurrentPotSize } from '../utils/gameUtils';
 
 /**
  * Hook for accessing and computing display-related game state

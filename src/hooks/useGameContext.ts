@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { GameContext } from '../contexts/GameContext';
-import type { GameContextType } from '../contexts/GameContext';
+import { GameContext } from '../contexts/gameContext';
+import type { GameContextType } from '../contexts/GameTypes';
 
 /**
  * Custom hook to use the game context

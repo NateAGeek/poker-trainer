@@ -2,10 +2,23 @@ import { useReducer } from 'react';
 import type { GameAction, GameContextState, GameContextType, GameProviderProps } from './GameTypes';
 import { GameContext } from './GameContext';
 import { initializeGame } from '../services/gameService';
+import { GameType, BettingDisplayMode } from '../types/poker';
+import type { GameSettings } from '../types/poker';
+
+// Default game settings
+const defaultGameSettings: GameSettings = {
+  gameType: GameType.CASH,
+  playerCount: 6,
+  startingStack: 1000,
+  smallBlind: 25,
+  bigBlind: 50,
+  bettingDisplayMode: BettingDisplayMode.BASE_AMOUNT,
+};
 
 // Initial state
 const initialGameState: GameContextState = {
-  gameState: initializeGame(6),
+  gameState: initializeGame(6, undefined, defaultGameSettings),
+  gameSettings: defaultGameSettings,
   playerCount: 6,
   revealedCommunityCards: 0,
   showdown: false,
@@ -15,11 +28,25 @@ const initialGameState: GameContextState = {
 function gameReducer(state: GameContextState, action: GameAction): GameContextState {
   switch (action.type) {
     case 'INITIALIZE_GAME': {
-      const { playerCount } = action.payload;
+      const { playerCount, gameSettings } = action.payload;
+      const newSettings = gameSettings || state.gameSettings;
       return {
         ...state,
-        gameState: initializeGame(playerCount),
+        gameState: initializeGame(playerCount, undefined, newSettings),
+        gameSettings: newSettings,
         playerCount,
+        revealedCommunityCards: 0,
+        showdown: false,
+      };
+    }
+
+    case 'UPDATE_GAME_SETTINGS': {
+      const { gameSettings } = action.payload;
+      return {
+        ...state,
+        gameSettings,
+        gameState: initializeGame(gameSettings.playerCount, undefined, gameSettings),
+        playerCount: gameSettings.playerCount,
         revealedCommunityCards: 0,
         showdown: false,
       };
@@ -57,7 +84,7 @@ function gameReducer(state: GameContextState, action: GameAction): GameContextSt
     case 'RESET_GAME': {
       return {
         ...state,
-        gameState: initializeGame(state.playerCount, state.gameState.dealerPosition),
+        gameState: initializeGame(state.playerCount, state.gameState.dealerPosition, state.gameSettings),
         revealedCommunityCards: 0,
         showdown: false,
       };

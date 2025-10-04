@@ -97,7 +97,7 @@ export function getNextActivePlayer(players: Player[], currentPlayer: number): n
   
   while (attempts < numPlayers) {
     const player = players[nextPlayer];
-    if (!player.hasFolded && !player.isAllIn) {
+    if (!player.hasFolded && !player.isAllIn && !player.isEliminated) {
       return nextPlayer;
     }
     nextPlayer = (nextPlayer + 1) % numPlayers;
@@ -108,11 +108,11 @@ export function getNextActivePlayer(players: Player[], currentPlayer: number): n
 }
 
 export function isBettingRoundComplete(players: Player[]): boolean {
-  const activePlayers = players.filter(p => !p.hasFolded && !p.isAllIn);
+  const activePlayers = players.filter(p => !p.hasFolded && !p.isAllIn && !p.isEliminated);
   
   if (activePlayers.length <= 1) return true;
   
-  const maxBet = Math.max(...players.map(p => p.currentBet));
+  const maxBet = Math.max(...players.filter(p => !p.isEliminated).map(p => p.currentBet));
   
   return activePlayers.every(player => {
     const hasActed = player.lastAction !== undefined;
@@ -289,28 +289,32 @@ export const AI_PERSONALITIES: Record<string, AIPersonality> = {
     bluffFrequency: 0.1,
     foldThreshold: 0.7,
     raiseBias: 0.2,
-    name: 'Tight Player'
+    name: 'Tight Player',
+    preflopRange: 'tight'
   },
   LOOSE_AGGRESSIVE: {
     aggressiveness: 0.8,
     bluffFrequency: 0.4,
     foldThreshold: 0.3,
     raiseBias: 0.7,
-    name: 'Aggressive Player'
+    name: 'Aggressive Player',
+    preflopRange: 'loose'
   },
   BALANCED: {
     aggressiveness: 0.5,
     bluffFrequency: 0.2,
     foldThreshold: 0.5,
     raiseBias: 0.4,
-    name: 'Balanced Player'
+    name: 'Balanced Player',
+    preflopRange: 'standard'
   },
   CALLING_STATION: {
     aggressiveness: 0.3,
     bluffFrequency: 0.05,
     foldThreshold: 0.2,
     raiseBias: 0.1,
-    name: 'Calling Station'
+    name: 'Calling Station',
+    preflopRange: 'loose'
   }
 };
 
@@ -323,6 +327,22 @@ export function makeAIDecision(
 ): { action: PlayerAction; amount?: number } {
   const personality = player.aiPersonality || AI_PERSONALITIES.BALANCED;
   
+  // For preflop decisions, use range-based logic if available
+  if (gameState.communityCards.length === 0 && player.hand.length === 2) {
+    const rangeDecision = makeRangeBasedDecision(
+      player,
+      personality,
+      availableActions,
+      minBet,
+      maxBet,
+      gameState.blinds.bigBlind
+    );
+    if (rangeDecision) {
+      return rangeDecision;
+    }
+  }
+  
+  // Fallback to original hand strength logic for postflop or when no range available
   const handStrength = calculateSimpleHandStrength(player.hand, gameState.communityCards);
   const random = Math.random();
   
@@ -364,6 +384,136 @@ export function makeAIDecision(
   if (availableActions.includes(Action.FOLD)) return { action: Action.FOLD };
   
   return { action: Action.FOLD };
+}
+
+/**
+ * Make AI decision based on preflop ranges
+ */
+function makeRangeBasedDecision(
+  player: Player,
+  personality: AIPersonality,
+  availableActions: PlayerAction[],
+  minBet: number,
+  maxBet: number,
+  bigBlind: number
+): { action: PlayerAction; amount?: number } | null {
+  // Import range utilities (we'll need to handle this import properly)
+  try {
+    // This would ideally be imported at the top, but for now we'll use dynamic import logic
+    // In a real implementation, we'd reorganize the files to avoid circular dependencies
+    
+    // For now, use a simplified range check
+    const handNotation = getSimpleHandNotation(player.hand);
+    if (!handNotation) return null;
+    
+    const shouldPlay = checkHandInSimpleRange(handNotation, personality);
+    
+    if (!shouldPlay.shouldPlay) {
+      if (availableActions.includes(Action.CHECK)) return { action: Action.CHECK };
+      if (availableActions.includes(Action.FOLD)) return { action: Action.FOLD };
+      return { action: Action.FOLD };
+    }
+    
+    // Hand is in range, decide action based on recommended action and personality
+    const recommendedAction = shouldPlay.action;
+    
+    if (recommendedAction === 'raise' && availableActions.includes(Action.RAISE)) {
+      const raiseAmount = Math.min(
+        minBet * (1 + personality.raiseBias),
+        Math.min(maxBet, player.chips)
+      );
+      return { action: Action.RAISE, amount: Math.floor(raiseAmount) };
+    }
+    
+    if (recommendedAction === 'raise' && availableActions.includes(Action.BET)) {
+      const betAmount = Math.min(
+        bigBlind * (2 + personality.aggressiveness),
+        Math.min(maxBet, player.chips)
+      );
+      return { action: Action.BET, amount: Math.floor(betAmount) };
+    }
+    
+    if (availableActions.includes(Action.CALL)) return { action: Action.CALL };
+    if (availableActions.includes(Action.CHECK)) return { action: Action.CHECK };
+    
+    return null;
+  } catch (error) {
+    console.warn('Error in range-based decision making:', error);
+    return null;
+  }
+}
+
+/**
+ * Simplified hand notation conversion
+ */
+function getSimpleHandNotation(cards: Card[]): string | null {
+  if (cards.length !== 2) return null;
+  
+  const [card1, card2] = cards;
+  const rank1 = card1.rank === '10' ? 'T' : card1.rank;
+  const rank2 = card2.rank === '10' ? 'T' : card2.rank;
+  
+  const rankOrder = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+  const rank1Value = rankOrder.indexOf(rank1);
+  const rank2Value = rankOrder.indexOf(rank2);
+  
+  let highRank, lowRank;
+  if (rank1Value <= rank2Value) {
+    highRank = rank1;
+    lowRank = rank2;
+  } else {
+    highRank = rank2;
+    lowRank = rank1;
+  }
+  
+  if (highRank === lowRank) {
+    return `${highRank}${lowRank}`;
+  }
+  
+  const suited = card1.suit === card2.suit;
+  return `${highRank}${lowRank}${suited ? 's' : 'o'}`;
+}
+
+/**
+ * Check if hand should be played based on simplified range logic
+ */
+function checkHandInSimpleRange(
+  handNotation: string, 
+  personality: AIPersonality
+): { shouldPlay: boolean; action: 'fold' | 'call' | 'raise' } {
+  // Premium hands
+  const premiumHands = ['AA', 'KK', 'QQ', 'JJ', 'AKs', 'AKo'];
+  if (premiumHands.includes(handNotation)) {
+    return { shouldPlay: true, action: 'raise' };
+  }
+  
+  // Strong hands
+  const strongHands = ['TT', '99', 'AQs', 'AQo', 'AJs', 'KQs', 'ATs'];
+  if (strongHands.includes(handNotation)) {
+    const shouldPlay = Math.random() < (1 - personality.foldThreshold * 0.3);
+    return { 
+      shouldPlay, 
+      action: Math.random() < personality.raiseBias ? 'raise' : 'call' 
+    };
+  }
+  
+  // Medium hands
+  const mediumHands = ['88', '77', '66', 'AJo', 'KQo', 'KJs', 'QJs', 'JTs', 'A9s', 'KTs'];
+  if (mediumHands.includes(handNotation)) {
+    const shouldPlay = Math.random() < (1 - personality.foldThreshold * 0.7);
+    return { shouldPlay, action: 'call' };
+  }
+  
+  // Loose hands (only if very loose personality)
+  if (personality.foldThreshold < 0.3) {
+    const looseHands = ['55', '44', '33', '22', 'A8s', 'A7s', 'A6s', 'A5s', 'K9s', 'Q9s', 'J9s', 'T9s', '98s'];
+    if (looseHands.includes(handNotation)) {
+      const shouldPlay = Math.random() < 0.5;
+      return { shouldPlay, action: 'call' };
+    }
+  }
+  
+  return { shouldPlay: false, action: 'fold' };
 }
 
 function calculateSimpleHandStrength(hand: Card[], communityCards: Card[]): number {

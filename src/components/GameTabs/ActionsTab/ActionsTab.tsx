@@ -10,15 +10,47 @@ export function ActionsTab() {
   const { gameInfo } = useGameStatus();
   const { winner } = useWinnerCalculation();
   const { handlePlayerAction } = usePlayerActions();
-  const { resetGame } = useGameControls();
+  const { newHand, resetSession } = useGameControls();
 
   const handleBettingAction = (action: string, amount?: number) => {
     handlePlayerAction(action as PlayerAction, amount);
   };
 
+  // Check if human player (player1) is eliminated
+  const humanPlayer = gameState.players.find(p => p.isHuman);
+  const isHumanEliminated = humanPlayer?.isEliminated || false;
+
+  // Check if only one player remains (game over)
+  const activePlayers = gameState.players.filter(p => !p.isEliminated);
+  const isGameOver = activePlayers.length <= 1;
+
   return (
     <div className="actions-tab">
-      {gameState.waitingForPlayerAction && !showdown ? (
+      {isHumanEliminated ? (
+        <div className="game-over-section">
+          <h3>💀 You've Been Eliminated!</h3>
+          <div className="elimination-message">
+            <p>You ran out of chips and have been eliminated from the game.</p>
+            <p>Better luck next time!</p>
+          </div>
+          <button onClick={resetSession} className="new-game-btn">
+            🔄 Start New Session
+          </button>
+        </div>
+      ) : isGameOver ? (
+        <div className="game-over-section">
+          <h3>🏆 Game Over!</h3>
+          <div className="game-over-message">
+            <p>Only one player remains!</p>
+            {activePlayers.length === 1 && (
+              <p><strong>{activePlayers[0].name} wins the game!</strong></p>
+            )}
+          </div>
+          <button onClick={resetSession} className="new-game-btn">
+            🔄 Start New Session
+          </button>
+        </div>
+      ) : gameState.waitingForPlayerAction && !showdown ? (
         <BettingInterface
           onAction={handleBettingAction}
         />
@@ -34,7 +66,7 @@ export function ActionsTab() {
         </div>
       ) : (
         <div className="showdown-section">
-          <h3>Hand Complete</h3>
+          <h3>Hand #{gameState.handNumber} Complete</h3>
           {winner && (
             <div className="winner-announcement">
               {winner.isTie ? (
@@ -46,8 +78,11 @@ export function ActionsTab() {
               )}
             </div>
           )}
-          <button onClick={resetGame} className="new-game-btn">
-            Deal New Hand
+          <div className="next-hand-info">
+            <p>Ready for the next hand? Dealer button will move to the next player.</p>
+          </div>
+          <button onClick={newHand} className="new-game-btn">
+            🃏 Next Hand
           </button>
         </div>
       )}

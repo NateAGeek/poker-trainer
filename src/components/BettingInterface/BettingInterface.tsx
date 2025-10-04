@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useMemo } from 'react';
 import { useGameContext } from '../../hooks/useGameContext';
+import { formatBettingAmount } from '../../utils/bettingUtils';
 import './BettingInterface.scss';
 
 export interface BettingInterfaceProps {
@@ -7,7 +8,7 @@ export interface BettingInterfaceProps {
 }
 
 export const BettingInterface: React.FC<BettingInterfaceProps> = ({ onAction }) => {
-  const { gameState } = useGameContext();
+  const { gameState, gameSettings } = useGameContext();
   const [customAmount, setCustomAmount] = useState<number>(0);
 
   const currentPlayer = gameState.players[gameState.currentPlayer];
@@ -51,9 +52,7 @@ export const BettingInterface: React.FC<BettingInterfaceProps> = ({ onAction }) 
   }, [onAction]);
 
   const formatChips = (amount: number): string => {
-    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
-    if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}K`;
-    return `$${amount}`;
+    return formatBettingAmount(amount, gameSettings.bigBlind, gameSettings.bettingDisplayMode);
   };
 
   return (

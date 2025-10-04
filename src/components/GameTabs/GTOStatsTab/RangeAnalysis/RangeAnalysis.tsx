@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RangeMatrix, PREDEFINED_RANGES } from '../../../RangeMatrix';
+import { RangeMatrix, getPredefinedRanges, getSavedRanges, saveCustomRange, deleteCustomRange } from '../../../RangeMatrix';
 import { RangeSelector } from '../RangeSelector';
 import type { PredefinedRange, RangeSelection } from '../../../RangeMatrix';
 import './RangeAnalysis.scss';
@@ -13,10 +13,14 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
   const [showFrequencies, setShowFrequencies] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [customRangeHands, setCustomRangeHands] = useState<Map<string, RangeSelection>>(new Map());
+  const [refreshKey, setRefreshKey] = useState(0); // Force re-render when ranges change
+
+  const predefinedRanges = React.useMemo(() => getPredefinedRanges(), []);
+  const savedRanges = React.useMemo(() => getSavedRanges(), [refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleRangeChange = (rangeKey: string) => {
     setSelectedRangeKey(rangeKey);
-    // Clear custom hands when switching to a predefined range
+    // Clear custom hands when switching away from custom range
     if (rangeKey !== 'customRange') {
       setCustomRangeHands(new Map());
     }
@@ -55,6 +59,8 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
         return newMap;
       });
     }
+    // For saved ranges and predefined ranges, we don't allow modification
+    // The range is displayed as-is from the selectedRange
   };
 
   const handleHandsBulkSelect = (hands: string[]) => {
@@ -108,10 +114,46 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
         return newMap;
       });
     }
+    // For saved ranges and predefined ranges, we don't allow modification
+    // The range is displayed as-is from the selectedRange
   };
 
   const handleClearCustomRange = () => {
     setCustomRangeHands(new Map());
+  };
+
+  const handleSaveCustomRange = (name: string) => {
+    if (customRangeHands.size > 0) {
+      const customRange: PredefinedRange = {
+        name,
+        description: `Custom saved range with ${customRangeHands.size} hands`,
+        color: "#6b7280",
+        hands: Array.from(customRangeHands.values())
+      };
+      
+      try {
+        saveCustomRange(name, customRange);
+        setRefreshKey(prev => prev + 1); // Force re-render to show new saved range
+        alert(`Range "${name}" saved successfully!`);
+      } catch (error) {
+        alert(`Error saving range: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
+  };
+
+  const handleDeleteRange = (key: string) => {
+    if (key.startsWith('saved_')) {
+      try {
+        deleteCustomRange(key);
+        setRefreshKey(prev => prev + 1); // Force re-render to remove deleted range
+        if (selectedRangeKey === key) {
+          setSelectedRangeKey('customRange'); // Switch to custom range if deleted range was selected
+        }
+        alert('Range deleted successfully!');
+      } catch (error) {
+        alert(`Error deleting range: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
   };
 
   const selectedRange: PredefinedRange | undefined = React.useMemo(() => {
@@ -126,8 +168,19 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
         hands: Array.from(customRangeHands.values())
       };
     }
-    return PREDEFINED_RANGES[selectedRangeKey];
-  }, [selectedRangeKey, customRangeHands]);
+    
+    // Check predefined ranges first
+    if (predefinedRanges[selectedRangeKey]) {
+      return predefinedRanges[selectedRangeKey];
+    }
+    
+    // Check saved ranges
+    if (savedRanges[selectedRangeKey]) {
+      return savedRanges[selectedRangeKey];
+    }
+    
+    return undefined;
+  }, [selectedRangeKey, customRangeHands, predefinedRanges, savedRanges]);
 
   return (
     <div className={`range-analysis ${className}`}>
@@ -140,6 +193,8 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
         onShowActionsChange={setShowActions}
         customRangeCount={customRangeHands.size}
         onClearCustomRange={handleClearCustomRange}
+        onSaveCustomRange={handleSaveCustomRange}
+        onDeleteRange={handleDeleteRange}
       />
 
       <div className="range-matrix-container">

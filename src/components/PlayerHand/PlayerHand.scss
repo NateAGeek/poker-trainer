@@ -64,6 +64,13 @@
     color: $color-accent;
     animation: pulse 2s infinite;
   }
+  
+  .eliminated-indicator {
+    color: #ff4444;
+    margin-left: 4px;
+    animation: none;
+    filter: drop-shadow(0 0 4px rgba(255, 68, 68, 0.5));
+  }
 }
 
 .player-hand--main {
@@ -92,6 +99,38 @@
   .chip-count {
     color: #ef4444;
     font-weight: $font-weight-bold;
+  }
+}
+
+.player-hand--eliminated {
+  opacity: 0.5;
+  border-color: rgba(128, 128, 128, 0.5);
+  background: rgba(0, 0, 0, 0.8);
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 10px,
+      rgba(255, 68, 68, 0.1) 10px,
+      rgba(255, 68, 68, 0.1) 20px
+    );
+    border-radius: $border-radius-xl;
+    pointer-events: none;
+  }
+  
+  .cards-container {
+    opacity: 0.3;
+  }
+  
+  .player-stats {
+    opacity: 0.7;
   }
 }
 
@@ -329,6 +368,17 @@
     font-size: 12px;
   }
   
+  &.eliminated {
+    color: #ff4444;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    .chip-icon {
+      display: none;
+    }
+  }
+  
   @media (max-width: $breakpoint-md) {
     font-size: 10px;
   }
@@ -439,6 +489,64 @@
     
     .hand-rank-icon {
       font-size: 10px;
+    }
+  }
+}
+
+// =========================================
+// PLAYER POSITION AT BOTTOM
+// =========================================
+
+.player-position-bottom {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: auto; // Push to bottom of flex container
+  
+  .position-indicator {
+    background: rgba(0, 0, 0, 0.8);
+    color: $color-white;
+    padding: 2px $spacing-2;
+    border-radius: $border-radius-sm;
+    font-size: 10px;
+    font-weight: $font-weight-bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    
+    &--dealer {
+      background: linear-gradient(135deg, $color-accent, darken($color-accent, 10%));
+      color: $color-black;
+      border-color: rgba($color-accent, 0.5);
+    }
+    
+    &--blinds {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: $color-white;
+      border-color: rgba(245, 158, 11, 0.5);
+    }
+    
+    &--early {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      color: $color-white;
+      border-color: rgba(249, 115, 22, 0.5);
+    }
+    
+    &--middle {
+      background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+      color: $color-white;
+      border-color: rgba(139, 92, 246, 0.5);
+    }
+    
+    &--late {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: $color-white;
+      border-color: rgba(16, 185, 129, 0.5);
+    }
+    
+    @media (max-width: $breakpoint-md) {
+      font-size: 8px;
+      padding: 1px $spacing-1;
     }
   }
 }

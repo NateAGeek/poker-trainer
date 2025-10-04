@@ -3,7 +3,9 @@ import { Card } from '../Card/Card';
 import { DealerChip } from '../DealerChip/DealerChip';
 import { evaluateHand } from '../../utils/pokerUtils';
 import { getPokerPosition, getPositionDisplay, shouldShowDealerChip, getPositionCategory } from '../../utils/positionUtils';
+import { formatChipStack, formatBettingAmount } from '../../utils/bettingUtils';
 import { useWinningCardsHighlight } from '../../hooks/useWinningCardsHighlight';
+import { useGameContext } from '../../hooks/useGameContext';
 import "./PlayerHand.scss";
 
 interface PlayerHandProps {
@@ -30,6 +32,7 @@ export function PlayerHand({
   const handEvaluation = showHandRank && player.hand.length >= 5 ? evaluateHand(player.hand) : null;
   const isMainPlayer = seatIndex === 0; // Assuming seat 0 is the main player
   const { isCardHighlighted } = useWinningCardsHighlight();
+  const { gameSettings } = useGameContext();
   
   // Get poker position for this player
   const pokerPosition = getPokerPosition(seatIndex, dealerSeatIndex, totalPlayers);
@@ -39,11 +42,14 @@ export function PlayerHand({
   // Get position category for styling
   const positionCategory = getPositionCategory(pokerPosition);
 
-  // Format chip count for better readability
+  // Format chip count using the new utility
   const formatChips = (amount: number): string => {
-    if (amount >= 1000000) return `$${(amount / 1000000).toFixed(1)}M`;
-    if (amount >= 1000) return `$${(amount / 1000).toFixed(1)}K`;
-    return `$${amount}`;
+    return formatChipStack(amount, gameSettings.bigBlind, gameSettings.bettingDisplayMode);
+  };
+
+  // Format betting amounts
+  const formatBet = (amount: number): string => {
+    return formatBettingAmount(amount, gameSettings.bigBlind, gameSettings.bettingDisplayMode);
   };
 
   // Determine player status classes
@@ -54,6 +60,7 @@ export function PlayerHand({
     if (isCurrentPlayer) classes.push('player-hand--current');
     if (player.hasFolded) classes.push('player-hand--folded');
     if (player.isAllIn) classes.push('player-hand--all-in');
+    if (player.isEliminated) classes.push('player-hand--eliminated');
     
     return classes.join(' ');
   };
@@ -77,7 +84,10 @@ export function PlayerHand({
             {positionDisplay}
           </span>
           <span className="player-actual-name">{player.name}</span>
-          {isCurrentPlayer && (
+          {player.isEliminated && (
+            <span className="eliminated-indicator" title="Eliminated">💀</span>
+          )}
+          {isCurrentPlayer && !player.isEliminated && (
             <span className="current-player-indicator" title="Current Player">●</span>
           )}
         </div>
@@ -103,22 +113,22 @@ export function PlayerHand({
         )}
         
         <div className="player-stats">
-          <div className="chip-count">
+          <div className={`chip-count ${player.isEliminated ? 'eliminated' : ''}`}>
             <span className="chip-icon">🪙</span>
-            {formatChips(player.chips)}
+            {player.isEliminated ? 'ELIMINATED' : formatChips(player.chips)}
           </div>
           
           {player.currentBet > 0 && (
             <div className="current-bet">
               <span className="bet-label">Bet:</span>
-              <span className="bet-amount">{formatChips(player.currentBet)}</span>
+              <span className="bet-amount">{formatBet(player.currentBet)}</span>
             </div>
           )}
           
           {player.totalBetThisRound > 0 && player.totalBetThisRound !== player.currentBet && (
             <div className="total-bet">
               <span className="total-label">Total:</span>
-              <span className="total-amount">{formatChips(player.totalBetThisRound)}</span>
+              <span className="total-amount">{formatBet(player.totalBetThisRound)}</span>
             </div>
           )}
         </div>
@@ -148,6 +158,13 @@ export function PlayerHand({
           <span className="hand-rank-text">{handEvaluation.description}</span>
         </div>
       )}
+      
+      {/* Player Position at Bottom */}
+      <div className="player-position-bottom">
+        <span className={`position-indicator position-indicator--${positionCategory}`}>
+          {positionDisplay}
+        </span>
+      </div>
     </div>
   );
 }

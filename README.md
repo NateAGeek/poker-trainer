@@ -1,69 +1,164 @@
-# React + TypeScript + Vite
+# Poker GTO Trainer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A comprehensive Texas Hold'em Poker Game-Theory Optimal (GTO) training application built with React, TypeScript, and Vite. This interactive trainer helps players learn and practice optimal poker strategies through various game modes and statistical analysis.
 
-Currently, two official plugins are available:
+## ✨ Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### 🎮 Game Modes
+- **Cash Games**: Traditional ring game format with customizable blinds and stacks
+- **Tournaments (MTT)**: Multi-table tournament structure with escalating blinds
+- **Heads-Up to 9-Player**: Support for 2-9 players at the table
 
-## Expanding the ESLint configuration
+### ⚙️ Comprehensive Game Settings
+- **Game Type Selection**: Choose between Cash Games and Tournaments
+- **Player Count**: Adjustable from 2 (heads-up) to 9 players (full ring)
+- **Starting Stacks**: Customizable chip stacks for different stakes
+- **Blind Structure**: Configurable small/big blinds and antes
+- **Betting Display Modes**: 
+  - Base Amount (chip values)
+  - Big Blind notation (BB format)
+- **Preset Configurations**: Quick setup for common game formats
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 📊 Advanced Analytics
+- **Range Analysis**: Detailed pre-flop and post-flop range construction
+- **Pot Odds Calculator**: Real-time pot odds and break-even calculations
+- **GTO Statistics**: Optimal play recommendations and analysis
+- **Hand History**: Track and review previous hands
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+### 🎯 Training Features
+- **Interactive Quizzes**: Test your GTO knowledge
+- **Real-time Feedback**: Get instant analysis of your decisions
+- **Statistical Tracking**: Monitor your progress over time
+- **AI Opponents**: Practice against different playing styles
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## 🚀 Getting Started
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### Prerequisites
+- Node.js (version 16 or higher)
+- npm or pnpm
+
+### Installation
+
+1. Clone the repository:
+```bash
+git clone https://github.com/your-username/poker-gto-trainer.git
+cd poker-gto-trainer
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Install dependencies:
+```bash
+pnpm install
+# or
+npm install
 ```
+
+3. Start the development server:
+```bash
+pnpm dev
+# or
+npm run dev
+```
+
+4. Open your browser and navigate to `http://localhost:5173`
+
+## 🎮 How to Play
+
+### Setting Up a Game
+
+1. **Access Game Settings**: Click the "⚙️ Settings" button in the header
+2. **Choose Game Type**: Select between Cash Game or Tournament
+3. **Configure Players**: Set the number of players (2-9)
+4. **Set Stakes**: Adjust blinds and starting stack sizes
+5. **Select Display Mode**: Choose between chip values or big blind notation
+6. **Apply Settings**: Click "Apply Settings" to start the game
+
+### Game Controls
+
+- **Fold**: Give up your hand
+- **Check**: Pass the action (when no bet to call)
+- **Call**: Match the current bet
+- **Bet/Raise**: Increase the betting amount
+- **All-In**: Bet all your remaining chips
+
+### Betting Interface
+
+- Use preset buttons for common bet sizes (1/4 pot, 1/2 pot, etc.)
+- Adjust bet amounts with the slider or input field
+- View pot odds and recommended actions
+
+## 📁 Project Structure
+
+```
+src/
+├── components/          # React components
+│   ├── GameSettings/    # Game configuration modal
+│   ├── PokerGame/       # Main game interface
+│   ├── BettingInterface/# Betting controls
+│   ├── GameTabs/        # Analysis and statistics tabs
+│   └── ...
+├── contexts/            # React context providers
+├── hooks/               # Custom React hooks
+├── services/            # Game logic and services
+├── types/               # TypeScript type definitions
+├── utils/               # Utility functions
+└── styles/              # SCSS stylesheets
+```
+
+## 🔧 Technical Stack
+
+- **Frontend**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: SCSS with modular components
+- **State Management**: React Context API
+- **Testing**: Vitest
+- **Code Quality**: ESLint + TypeScript strict mode
+
+## 🎨 Game Settings Options
+
+### Cash Game Presets
+- **Micro Stakes**: 1/2 blinds, 200 starting stack
+- **Low Stakes**: 5/10 blinds, 1000 starting stack
+- **Mid Stakes**: 25/50 blinds, 5000 starting stack
+- **High Stakes**: 100/200 blinds, 20000 starting stack
+
+### Tournament Presets
+- **Turbo**: Fast-paced 10-minute levels
+- **Regular**: Standard 15-minute levels
+- **Deep Stack**: Longer tournaments with larger stacks
+
+### Display Modes
+- **Base Amount**: Shows actual chip values ($25, $150, etc.)
+- **Big Blinds**: Shows amounts relative to big blind (0.5 BB, 3 BB, etc.)
+
+## 🧮 Betting Utils
+
+The application includes sophisticated betting calculation utilities:
+
+- **formatBettingAmount()**: Smart formatting based on display mode
+- **formatChipStack()**: Dual display showing both chips and BB
+- **getBettingStep()**: Appropriate betting increments
+- **parseBettingInput()**: Convert user input to chip amounts
+
+## 🎯 Future Enhancements
+
+- [ ] Advanced GTO solver integration
+- [ ] Multiplayer online functionality
+- [ ] Hand replay system
+- [ ] Export/import hand histories
+- [ ] Mobile responsive design
+- [ ] Custom AI personality training
+- [ ] Tournament leaderboards
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request. For major changes, please open an issue first to discuss what you would like to change.
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+## 🙏 Acknowledgments
+
+- Game theory concepts based on modern poker strategy
+- UI/UX inspired by professional poker software
+- Built with modern React patterns and best practices

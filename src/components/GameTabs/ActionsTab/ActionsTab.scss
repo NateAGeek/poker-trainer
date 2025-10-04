@@ -93,6 +93,86 @@
     }
   }
   
+  .next-hand-info {
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: $border-radius-lg;
+    padding: $spacing-3;
+    margin: $spacing-4 0;
+    
+    p {
+      margin: 0;
+      color: #3b82f6;
+      font-size: $font-size-sm;
+      font-style: italic;
+    }
+  }
+  
+  .new-game-btn {
+    background: linear-gradient(135deg, $color-accent 0%, darken($color-accent, 10%) 100%);
+    color: $color-white;
+    border: none;
+    padding: $spacing-3 $spacing-6;
+    border-radius: $border-radius-lg;
+    font-size: $font-size-md;
+    font-weight: $font-weight-semibold;
+    cursor: pointer;
+    transition: all $transition-fast;
+    box-shadow: $shadow-md;
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: $shadow-lg;
+    }
+    
+    &:active {
+      transform: translateY(0);
+    }
+  }
+}
+
+.game-over-section {
+  text-align: center;
+  padding: $spacing-4;
+  
+  h3 {
+    margin: 0 0 $spacing-4 0;
+    color: $color-white;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    text-align: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: $spacing-3;
+  }
+  
+  .elimination-message,
+  .game-over-message {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: $border-radius-lg;
+    padding: $spacing-4;
+    margin: $spacing-4 0;
+    
+    p {
+      margin: 0 0 $spacing-2 0;
+      color: #ff6b6b;
+      font-weight: $font-weight-medium;
+      
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+  
+  .game-over-message {
+    background: rgba(34, 197, 94, 0.1);
+    border-color: rgba(34, 197, 94, 0.3);
+    
+    p {
+      color: #22c55e;
+    }
+  }
+  
   .new-game-btn {
     background: linear-gradient(135deg, $color-accent 0%, darken($color-accent, 10%) 100%);
     color: $color-white;

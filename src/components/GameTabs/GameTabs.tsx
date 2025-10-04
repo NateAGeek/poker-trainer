@@ -3,6 +3,7 @@ import { ActionsTab } from './ActionsTab/ActionsTab';
 import { GTOStatsTab } from './GTOStatsTab/GTOStatsTab';
 import { ResultsTab } from './ResultsTab/ResultsTab';
 import { HistoryTab } from './HistoryTab/HistoryTab';
+import { SessionStatsTab } from './SessionStatsTab/SessionStatsTab';
 import { useGameContext } from '../../hooks/useGameContext';
 import 'react-tabs/style/react-tabs.css';
 import "./GameTabs.scss";
@@ -30,6 +31,10 @@ export function GameTabs() {
             <span className="tab-icon">📋</span>
             <span className="tab-label">History</span>
           </Tab>
+          <Tab className="tab" selectedClassName="tab--selected">
+            <span className="tab-icon">📈</span>
+            <span className="tab-label">Session</span>
+          </Tab>
         </TabList>
 
         {/* Actions Tab */}
@@ -50,6 +55,11 @@ export function GameTabs() {
         {/* History Tab */}
         <TabPanel className="tab-panel">
           <HistoryTab />
+        </TabPanel>
+
+        {/* Session Stats Tab */}
+        <TabPanel className="tab-panel">
+          <SessionStatsTab />
         </TabPanel>
       </Tabs>
     </div>

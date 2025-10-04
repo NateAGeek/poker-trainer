@@ -1,0 +1,525 @@
+.ai-range-settings {
+  padding: 1rem;
+  
+  // Define CSS custom properties for proper dark theme support
+  --ai-text-primary: #e5e7eb;
+  --ai-text-secondary: #9ca3af;
+  --ai-text-accent: #34d399;
+  --ai-bg-primary: #1f2937;
+  --ai-bg-secondary: #374151;
+  --ai-border-color: #4b5563;
+  --ai-hover-bg: rgba(52, 211, 153, 0.1);
+  --ai-button-primary: #10b981;
+  --ai-button-hover: #059669;
+  --ai-danger-color: #ef4444;
+  --ai-danger-hover: #dc2626;
+  
+  .ai-range-header {
+    margin-bottom: 1.5rem;
+    
+    h3 {
+      margin: 0 0 0.5rem 0;
+      color: var(--ai-text-primary);
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    
+    p {
+      margin: 0;
+      color: var(--ai-text-secondary);
+      font-size: 0.9rem;
+    }
+  }
+  
+  .player-selector {
+    margin-bottom: 1.5rem;
+    
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: var(--ai-text-primary);
+    }
+    
+    select {
+      width: 100%;
+      padding: 0.5rem;
+      border: 1px solid var(--ai-border-color);
+      border-radius: 0.25rem;
+      background: var(--ai-bg-primary);
+      color: var(--ai-text-primary);
+      font-size: 0.9rem;
+      
+      &:focus {
+        outline: none;
+        border-color: var(--ai-button-primary);
+        box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+      }
+    }
+  }
+  
+  .range-tabs {
+    display: flex;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--ai-border-color);
+    
+    .tab {
+      padding: 0.75rem 1rem;
+      border: none;
+      background: none;
+      color: var(--ai-text-secondary);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      position: relative;
+      
+      &:hover:not(:disabled) {
+        color: var(--ai-text-primary);
+        background: var(--ai-hover-bg);
+      }
+      
+      &.active {
+        color: var(--ai-text-accent);
+        border-bottom-color: var(--ai-text-accent);
+      }
+      
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        
+        .coming-soon {
+          display: inline-block;
+          margin-left: 0.5rem;
+          font-size: 0.75rem;
+          background: #f59e0b;
+          color: white;
+          padding: 0.125rem 0.25rem;
+          border-radius: 0.125rem;
+        }
+      }
+    }
+  }
+  
+  .range-content {
+    .preflop-range-settings {
+      .range-selection {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1.5rem;
+        
+        .current-range-info {
+          flex: 1;
+          
+          h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--ai-text-primary);
+          }
+          
+          .range-info {
+            .range-name {
+              display: block;
+              font-weight: 500;
+              color: var(--ai-text-accent);
+              margin-bottom: 0.25rem;
+            }
+            
+            .range-description {
+              display: block;
+              font-size: 0.9rem;
+              color: var(--ai-text-secondary);
+            }
+          }
+          
+          .no-range {
+            color: var(--ai-text-secondary);
+            font-style: italic;
+          }
+        }
+        
+        .select-range-btn {
+          padding: 0.5rem 1rem;
+          background: var(--ai-button-primary);
+          color: white;
+          border: none;
+          border-radius: 0.25rem;
+          font-size: 0.9rem;
+          cursor: pointer;
+          
+          &:hover {
+            background: var(--ai-button-hover);
+          }
+        }
+      }
+      
+      .range-selector {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border: 1px solid var(--ai-border-color);
+        border-radius: 0.5rem;
+        background: var(--ai-bg-secondary);
+        
+        .predefined-ranges {
+          margin-bottom: 1.5rem;
+          
+          h5 {
+            margin: 0 0 1rem 0;
+            color: var(--ai-text-primary);
+          }
+          
+          .range-options {
+            display: grid;
+            gap: 0.5rem;
+            
+            .range-option {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              
+              .range-option-btn {
+                flex: 1;
+                padding: 0.75rem;
+                border: 1px solid var(--ai-border-color);
+                border-radius: 0.25rem;
+                background: var(--ai-bg-primary);
+                color: var(--ai-text-primary);
+                text-align: left;
+                cursor: pointer;
+                
+                &:hover {
+                  border-color: var(--ai-button-primary);
+                  background: var(--ai-hover-bg);
+                }
+                
+                .range-name {
+                  display: block;
+                  font-weight: 500;
+                  margin-bottom: 0.25rem;
+                }
+                
+                .range-hands-count {
+                  font-size: 0.8rem;
+                  color: var(--ai-text-secondary);
+                }
+              }
+              
+              .delete-range-btn {
+                width: 2rem;
+                height: 2rem;
+                border: none;
+                border-radius: 0.25rem;
+                background: var(--ai-danger-color);
+                color: white;
+                cursor: pointer;
+                font-size: 0.8rem;
+                
+                &:hover {
+                  background: var(--ai-danger-hover);
+                }
+              }
+            }
+          }
+        }
+        
+        .custom-range-creator {
+          border-top: 1px solid var(--ai-border-color);
+          padding-top: 1rem;
+          
+          h5 {
+            margin: 0 0 1rem 0;
+            color: var(--ai-text-primary);
+          }
+          
+          .create-custom-btn {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--ai-button-primary);
+            border-radius: 0.25rem;
+            background: transparent;
+            color: var(--ai-button-primary);
+            cursor: pointer;
+            
+            &:hover {
+              background: var(--ai-button-primary);
+              color: white;
+            }
+          }
+          
+          .custom-range-form {
+            input {
+              width: 100%;
+              padding: 0.5rem;
+              border: 1px solid var(--ai-border-color);
+              border-radius: 0.25rem;
+              background: var(--ai-bg-primary);
+              color: var(--ai-text-primary);
+              margin-bottom: 0.5rem;
+              
+              &:focus {
+                outline: none;
+                border-color: var(--ai-button-primary);
+                box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+              }
+            }
+            
+            .form-actions {
+              display: flex;
+              gap: 0.5rem;
+              
+              button {
+                padding: 0.5rem 1rem;
+                border: none;
+                border-radius: 0.25rem;
+                cursor: pointer;
+                font-size: 0.9rem;
+                
+                &:first-child {
+                  background: var(--ai-button-primary);
+                  color: white;
+                  
+                  &:hover {
+                    background: var(--ai-button-hover);
+                  }
+                }
+                
+                &:last-child {
+                  background: var(--ai-bg-secondary);
+                  color: var(--ai-text-primary);
+                  border: 1px solid var(--ai-border-color);
+                  
+                  &:hover {
+                    background: var(--ai-border-color);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      .custom-range-editor {
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border: 2px solid var(--ai-text-accent);
+        border-radius: 0.5rem;
+        background: var(--ai-bg-secondary);
+        
+        .editor-header {
+          margin-bottom: 1rem;
+          
+          h4 {
+            margin: 0 0 0.5rem 0;
+            color: var(--ai-text-accent);
+          }
+          
+          p {
+            margin: 0;
+            color: var(--ai-text-secondary);
+            font-size: 0.9rem;
+          }
+        }
+        
+        .editor-controls {
+          display: flex;
+          gap: 1.5rem;
+          margin-bottom: 1rem;
+          flex-wrap: wrap;
+          
+          .control-group {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            
+            label {
+              font-size: 0.9rem;
+              color: var(--ai-text-primary);
+              font-weight: 500;
+            }
+            
+            select {
+              padding: 0.25rem 0.5rem;
+              border: 1px solid var(--ai-border-color);
+              border-radius: 0.25rem;
+              background: var(--ai-bg-primary);
+              color: var(--ai-text-primary);
+              font-size: 0.9rem;
+            }
+            
+            input[type="range"] {
+              width: 100px;
+            }
+            
+            .frequency-display {
+              font-weight: 600;
+              color: var(--ai-text-accent);
+              min-width: 3rem;
+            }
+            
+            .hands-count {
+              color: var(--ai-text-accent);
+              font-weight: 600;
+              font-size: 0.9rem;
+            }
+          }
+        }
+        
+        .editor-actions {
+          display: flex;
+          gap: 0.5rem;
+          
+          .save-btn {
+            padding: 0.5rem 1rem;
+            background: var(--ai-button-primary);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            
+            &:hover:not(:disabled) {
+              background: var(--ai-button-hover);
+            }
+            
+            &:disabled {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+          }
+          
+          .cancel-btn {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            color: var(--ai-text-secondary);
+            border: 1px solid var(--ai-border-color);
+            border-radius: 0.25rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            
+            &:hover {
+              background: var(--ai-border-color);
+              color: var(--ai-text-primary);
+            }
+          }
+        }
+      }
+      
+      .range-visualization {
+        h4 {
+          margin: 0 0 1rem 0;
+          color: var(--ai-text-primary);
+        }
+        
+        .ai-range-matrix {
+          margin-bottom: 1rem;
+          max-width: 100%;
+          overflow-x: auto;
+        }
+        
+        .range-stats {
+          display: flex;
+          gap: 2rem;
+          padding: 1rem;
+          background: var(--ai-bg-secondary);
+          border-radius: 0.5rem;
+          border: 1px solid var(--ai-border-color);
+          
+          .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+            
+            .label {
+              font-size: 0.8rem;
+              color: var(--ai-text-secondary);
+              font-weight: 500;
+            }
+            
+            .value {
+              font-size: 1.1rem;
+              color: var(--ai-text-primary);
+              font-weight: 600;
+            }
+          }
+        }
+      }
+      
+      .no-range-message {
+        padding: 2rem;
+        text-align: center;
+        background: var(--ai-bg-secondary);
+        border-radius: 0.5rem;
+        border: 1px dashed var(--ai-border-color);
+        
+        p {
+          margin: 0;
+          color: var(--ai-text-secondary);
+          font-style: italic;
+        }
+      }
+    }
+    
+    .postflop-range-settings {
+      .coming-soon-message {
+        text-align: center;
+        padding: 3rem 1rem;
+        
+        h4 {
+          margin: 0 0 1rem 0;
+          color: var(--ai-text-primary);
+        }
+        
+        p {
+          margin: 0;
+          color: var(--ai-text-secondary);
+          max-width: 400px;
+          margin: 0 auto;
+          line-height: 1.5;
+        }
+      }
+    }
+  }
+}
+
+// No AI players message
+.no-ai-players {
+  padding: 2rem;
+  text-align: center;
+  background: var(--ai-bg-secondary, #374151);
+  border-radius: 0.5rem;
+  border: 1px solid var(--ai-border-color, #4b5563);
+  
+  p {
+    margin: 0;
+    color: var(--ai-text-secondary, #9ca3af);
+    font-style: italic;
+  }
+}
+
+// Dark mode fallbacks and improved contrast
+@media (prefers-color-scheme: dark) {
+  .ai-range-settings {
+    --ai-text-primary: #f3f4f6;
+    --ai-text-secondary: #d1d5db;
+    --ai-text-accent: #34d399;
+    --ai-bg-primary: #111827;
+    --ai-bg-secondary: #1f2937;
+    --ai-border-color: #374151;
+    --ai-hover-bg: rgba(52, 211, 153, 0.15);
+    --ai-button-primary: #10b981;
+    --ai-button-hover: #059669;
+    
+    .range-selector {
+      background: var(--ai-bg-secondary);
+      border-color: var(--ai-border-color);
+    }
+    
+    .range-option-btn {
+      background: var(--ai-bg-primary);
+      border-color: var(--ai-border-color);
+      
+      &:hover {
+        background: var(--ai-hover-bg);
+      }
+    }
+  }
+}

@@ -61,6 +61,20 @@ export interface AIPersonality {
   foldThreshold: number; // 0-1 (0 = folds easily, 1 = never folds)
   raiseBias: number; // 0-1 (0 = prefers calling, 1 = prefers raising)
   name?: string; // Optional custom AI name
+  preflopRange?: string; // Reference to predefined range key
+  customRanges?: {
+    preflop?: AIRange;
+    postflop?: AIRange;
+  };
+}
+
+export interface AIRange {
+  name: string;
+  hands: Array<{
+    hand: string;
+    frequency: number; // 0-1 probability of playing this hand
+    action: 'fold' | 'call' | 'raise'; // Preferred action for this hand
+  }>;
 }
 
 export interface Player {
@@ -72,6 +86,7 @@ export interface Player {
   totalBetThisRound: number;
   hasFolded: boolean;
   isAllIn: boolean;
+  isEliminated: boolean;
   isDealer: boolean;
   position: PlayerPosition;
   lastAction?: PlayerAction;
@@ -102,10 +117,12 @@ export interface GameState {
   blinds: {
     smallBlind: number;
     bigBlind: number;
+    ante?: number;
   };
   handNumber: number;
   waitingForPlayerAction: boolean;
   maxPlayers: number;
+  gameSettings?: GameSettings;
 }
 
 export const HandRanking = {
@@ -128,4 +145,72 @@ export interface HandEvaluation {
   description: string;
   cards: Card[];
   winningCards?: Card[]; // The specific cards that create the winning hand
+}
+
+export interface HandHistory {
+  handNumber: number;
+  winner: {
+    playerId: string;
+    playerName: string;
+    hand: Card[];
+    evaluation: HandEvaluation;
+    amountWon: number;
+  } | null;
+  communityCards: Card[];
+  finalPot: number;
+  playerHands: Array<{
+    playerId: string;
+    playerName: string;
+    hand: Card[];
+    evaluation?: HandEvaluation;
+    finalChips: number;
+    actions: Array<{
+      action: PlayerAction;
+      amount?: number;
+      phase: 'preflop' | 'flop' | 'turn' | 'river';
+    }>;
+  }>;
+  timestamp: number;
+}
+
+export interface GameSession {
+  sessionId: string;
+  startTime: number;
+  handsPlayed: number;
+  handsWon: number;
+  totalWinnings: number;
+  biggestPot: number;
+  history: HandHistory[];
+}
+
+export const GameType = {
+  CASH: 'cash',
+  MTT: 'mtt'
+} as const;
+
+export type GameType = typeof GameType[keyof typeof GameType];
+
+export const BettingDisplayMode = {
+  BIG_BLINDS: 'big_blinds',
+  BASE_AMOUNT: 'base_amount'
+} as const;
+
+export type BettingDisplayMode = typeof BettingDisplayMode[keyof typeof BettingDisplayMode];
+
+export interface GameSettings {
+  gameType: GameType;
+  playerCount: number;
+  startingStack: number;
+  smallBlind: number;
+  bigBlind: number;
+  bettingDisplayMode: BettingDisplayMode;
+  ante?: number; // For MTT
+  blindLevels?: Array<{
+    level: number;
+    smallBlind: number;
+    bigBlind: number;
+    ante?: number;
+    duration?: number; // in minutes
+  }>; // For MTT
+  aiPersonalities?: AIPersonality[]; // AI player configurations
 }

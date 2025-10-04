@@ -1,5 +1,5 @@
 import { useCallback } from 'react';
-import type { PlayerAction, Player } from '../types/poker';
+import type { PlayerAction, Player, HandHistory } from '../types/poker';
 import { PlayerAction as Action } from '../types/poker';
 import { useGameContext } from './useGameContext';
 import { 
@@ -9,6 +9,8 @@ import {
   collectBets
 } from '../utils/gameUtils';
 import { getNextGamePhase, getCardsForPhase } from '../services/gameService';
+import { createHandHistory } from '../utils/handHistoryUtils';
+import { determineWinnerAndDistributePot } from '../utils/potDistributionUtils';
 
 /**
  * Hook for handling player actions (betting, folding, etc.)
@@ -106,16 +108,28 @@ export function usePlayerActions() {
       newState.gamePhase = nextPhase;
       
       if (nextPhase === 'showdown') {
+        // Distribute pot to winner(s) before creating hand history
+        const gameStateWithPotDistributed = determineWinnerAndDistributePot(newState);
+        
+        // Create hand history for session tracking
+        const handHistory = createHandHistory(gameStateWithPotDistributed, gameStateWithPotDistributed.handNumber);
+        
         // Update waiting state for showdown
-        newState.waitingForPlayerAction = false;
+        gameStateWithPotDistributed.waitingForPlayerAction = false;
         
         // Use the combined action to update game state and set showdown atomically
         dispatch({ 
           type: 'UPDATE_GAME_STATE_AND_SHOWDOWN', 
           payload: { 
-            gameState: newState,
+            gameState: gameStateWithPotDistributed,
             showdown: true
           } 
+        });
+        
+        // Complete the hand and update session stats
+        dispatch({
+          type: 'COMPLETE_HAND',
+          payload: { handHistory }
         });
         
         return; // Early return to avoid duplicate dispatch
@@ -202,6 +216,18 @@ export function useGameControls() {
     dispatch({ type: 'RESET_GAME' });
   }, [dispatch]);
 
+  const newHand = useCallback(() => {
+    dispatch({ type: 'NEW_HAND' });
+  }, [dispatch]);
+
+  const resetSession = useCallback(() => {
+    dispatch({ type: 'RESET_SESSION' });
+  }, [dispatch]);
+
+  const completeHand = useCallback((handHistory: HandHistory) => {
+    dispatch({ type: 'COMPLETE_HAND', payload: { handHistory } });
+  }, [dispatch]);
+
   const revealCommunityCards = useCallback((count: number) => {
     dispatch({ type: 'REVEAL_COMMUNITY_CARDS', payload: { count } });
   }, [dispatch]);
@@ -213,6 +239,9 @@ export function useGameControls() {
   return {
     initializeNewGame,
     resetGame,
+    newHand,
+    resetSession,
+    completeHand,
     revealCommunityCards,
     setShowdown
   };

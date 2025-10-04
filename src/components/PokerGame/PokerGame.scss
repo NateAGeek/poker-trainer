@@ -23,9 +23,9 @@
 // =========================================
 
 .game-header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
-  justify-content: space-between;
   background: linear-gradient(135deg, rgba(15, 81, 50, 0.95) 0%, rgba(10, 54, 34, 0.98) 100%);
   -webkit-backdrop-filter: blur(20px);
   backdrop-filter: blur(20px);
@@ -51,93 +51,72 @@
     background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%);
     z-index: 1;
   }
-  
-  h1 {
-    font-size: $font-size-2xl;
-    font-weight: $font-weight-semibold;
-    margin: 0;
-    color: $color-white;
-    letter-spacing: $letter-spacing-wide;
-    font-family: $font-family-sans;
-    position: relative;
-    z-index: 2;
-    
-    // Subtle text glow effect
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-  }
-  
-  // Player Count Selector in header
-  .player-count-selector {
+
+  .header-left {
     display: flex;
-    align-items: center;
-    gap: $spacing-3;
-    position: relative;
-    z-index: 2;
-    background: rgba(0, 0, 0, 0.4);
-    padding: $spacing-2 $spacing-4;
-    border-radius: $border-radius-xl;
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: $spacing-1;
+    justify-self: start;
     
-    label {
-      font-size: $font-size-sm;
+    h1 {
+      font-size: $font-size-2xl;
       font-weight: $font-weight-semibold;
+      margin: 0;
       color: $color-white;
       letter-spacing: $letter-spacing-wide;
-      text-transform: uppercase;
-      margin: 0;
-      white-space: nowrap;
+      font-family: $font-family-sans;
+      position: relative;
+      z-index: 2;
+      
+      // Subtle text glow effect
+      text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
     }
-    
-    select {
-      background: rgba(255, 255, 255, 0.95);
-      border: 1px solid rgba(0, 0, 0, 0.2);
-      color: $color-gray-800;
-      padding: $spacing-2 $spacing-4;
+
+    .game-type-indicator {
+      font-size: $font-size-xs;
+      color: rgba(255, 255, 255, 0.7);
+      text-transform: uppercase;
+      letter-spacing: $letter-spacing-wider;
+      font-weight: $font-weight-medium;
+    }
+  }
+
+  .header-center {
+    justify-self: center;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: $spacing-4;
+    justify-self: end;
+
+    .settings-button {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: $color-white;
+      padding: $spacing-2 $spacing-3;
       border-radius: $border-radius-lg;
       font-size: $font-size-sm;
-      font-weight: $font-weight-semibold;
-      font-family: $font-family-sans;
-      min-width: 180px;
+      font-weight: $font-weight-medium;
       cursor: pointer;
-      transition: $transition-colors;
-      
-      // Custom arrow styling
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23374151' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right $spacing-3 center;
-      background-size: 16px;
-      padding-right: $spacing-8;
-      
-      &:hover:not(:disabled) {
-        background: $color-white;
-        border-color: rgba(0, 0, 0, 0.3);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.3);
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       }
-      
-      &:focus {
-        outline: none;
-        border-color: $color-primary;
-        box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.2);
-        background: $color-white;
-      }
-      
-      &:disabled {
-        opacity: 0.6;
-        cursor: not-allowed;
-        background: rgba(255, 255, 255, 0.5);
-      }
-      
-      option {
-        background: $color-white;
-        color: $color-gray-800;
-        padding: $spacing-2;
-        font-weight: $font-weight-medium;
+
+      &:active {
+        transform: translateY(0);
       }
     }
   }
-  
   .game-info {
     display: flex;
     align-items: center;
@@ -226,8 +205,46 @@
           color: rgba(74, 222, 128, 0.8);
         }
       }
+
+      // Special styling for settings button
+      &.settings-info {
+        padding: 0;
+        min-width: auto;
+        
+        .settings-button {
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          color: $color-white;
+          padding: $spacing-2 $spacing-3;
+          border-radius: $border-radius-lg;
+          font-size: $font-size-sm;
+          font-weight: $font-weight-medium;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          display: flex;
+          align-items: center;
+          gap: $spacing-2;
+          white-space: nowrap;
+
+          &:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+          }
+
+          &:active {
+            transform: translateY(0);
+          }
+        }
+
+        // Override default hover for settings-info
+        &:hover {
+          background: transparent;
+          transform: none;
+        }
+      }
       
-      &:hover {
+      &:hover:not(.settings-info) {
         background: rgba(255, 255, 255, 0.05);
         transform: translateY(-1px);
       }
@@ -235,49 +252,43 @@
   }
   
   @media (max-width: $breakpoint-md) {
-    flex-direction: column;
-    gap: $spacing-4;
-    padding: $spacing-4;
+    grid-template-columns: 1fr;
+    gap: $spacing-3;
+    padding: $spacing-3 $spacing-4;
     
-    h1 {
-      font-size: $font-size-xl;
+    .header-left {
+      align-items: center;
       text-align: center;
-    }
-    
-    .player-count-selector {
-      flex-direction: column;
-      gap: $spacing-2;
-      align-self: stretch;
       
-      select {
-        min-width: auto;
-        width: 100%;
+      h1 {
+        font-size: $font-size-xl;
       }
     }
-    
-    .game-info {
-      justify-content: center;
-      gap: $spacing-3;
-      align-self: stretch;
-      
-      .info-item {
-        flex: 1;
-        min-width: 70px;
-        
-        .info-label {
-          font-size: 10px;
-        }
-        
-        .info-value {
-          font-size: $font-size-sm;
-        }
-        
-        &.pot-info .info-value {
-          font-size: $font-size-base;
-        }
-        
-        &.dealer-info .info-value {
-          font-size: $font-size-base;
+
+    .header-right {
+      justify-self: center;
+
+      .game-info {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: $spacing-2;
+
+        .info-item {
+          min-width: 70px;
+          padding: $spacing-2;
+
+          .info-label {
+            font-size: $font-size-xs;
+          }
+
+          .info-value {
+            font-size: $font-size-sm;
+          }
+
+          &.settings-info .settings-button {
+            padding: $spacing-2;
+            font-size: $font-size-xs;
+          }
         }
       }
     }

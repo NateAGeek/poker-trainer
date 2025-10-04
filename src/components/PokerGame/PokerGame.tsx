@@ -1,20 +1,29 @@
 import { Hand } from '../Hand/Hand';
-import { PlayerCountSelector } from '../PlayerCountSelector';
 import { GameTabs } from '../GameTabs/GameTabs';
+import { GameSettings } from '../GameSettings';
 import { TablePlayer } from './TablePlayer';
 import { useGameDisplay, useGameStatus } from '../../hooks/useGameDisplay';
-import { useGameControls } from '../../hooks/useGameActions';
 import { useAIAutomation } from '../../hooks/useAIAutomation';
 import { useTableLayout, usePotDisplay } from '../../hooks/useTableLayout';
-import { useEffect, useMemo } from 'react';
+import { useGameContext } from '../../hooks/useGameContext';
+import { useGameControls } from '../../hooks/useGameActions';
+import { useEffect, useMemo, useState } from 'react';
 import { calculateCurrentPotSize } from '../../utils/gameUtils';
+import { formatBettingAmount } from '../../utils/bettingUtils';
+import type { GameSettings as GameSettingsType } from '../../types/poker';
 import "./PokerGame.scss";
 
 export function PokerGame() {
   // Custom hooks for game state and actions
   const { gameState, visibleCommunityCards, showdown } = useGameDisplay();
-  const { gameInfo, playerCount, canChangePlayerCount } = useGameStatus();
-  const { initializeNewGame } = useGameControls();
+  const { gameInfo } = useGameStatus();
+  const { gameSettings, dispatch } = useGameContext();
+  
+  // Import useGameControls for reset functionality
+  const { resetSession } = useGameControls();
+  
+  // Local state for settings modal
+  const [showSettings, setShowSettings] = useState(false);
   
   // Table layout and positioning
   const { tableBoardRef, positionedPlayers } = useTableLayout();
@@ -34,32 +43,67 @@ export function PokerGame() {
   // Auto-handle AI actions
   useAIAutomation();
 
-  // Handler for player count changes
-  const handlePlayerCountChange = (newCount: number) => {
-    initializeNewGame(newCount);
+  // Format pot amount based on display mode
+  const formattedPotAmount = useMemo(() => {
+    return formatBettingAmount(
+      currentPotSize, 
+      gameSettings.bigBlind, 
+      gameSettings.bettingDisplayMode
+    );
+  }, [currentPotSize, gameSettings]);
+
+  // Handler for game settings changes
+  const handleSettingsChange = (newSettings: GameSettingsType) => {
+    dispatch({
+      type: 'UPDATE_GAME_SETTINGS',
+      payload: { gameSettings: newSettings }
+    });
   };
 
   return (
     <div className="poker-game">
       <div className="game-header">
-        <h1>Texas Hold'em Poker</h1>
-        <PlayerCountSelector
-          playerCount={playerCount}
-          onPlayerCountChange={handlePlayerCountChange}
-          disabled={!canChangePlayerCount}
-        />
-        <div className="game-info">
-          <div className="info-item phase-info">
-            <span className="info-label">Phase</span>
-            <span className="info-value">{gameInfo.phase}</span>
+        <div className="header-left">
+          <h1>Texas Hold'em Poker</h1>
+          <div className="game-type-indicator">
+            {gameSettings.gameType === 'cash' ? 'Cash Game' : 'Tournament'}
           </div>
-          <div className="info-item pot-info">
-            <span className="info-label">Pot</span>
-            <span className="info-value">${gameInfo.pot}</span>
-          </div>
-          <div className="info-item dealer-info">
-            <span className="info-label">Dealer</span>
-            <span className="info-value">P{gameState.dealerPosition + 1}</span>
+        </div>
+        
+        <div className="header-right">
+          <div className="game-info">
+            <div className="info-item phase-info">
+              <span className="info-label">Phase</span>
+              <span className="info-value">{gameInfo.phase}</span>
+            </div>
+            <div className="info-item pot-info">
+              <span className="info-label">Pot</span>
+              <span className="info-value">{formattedPotAmount}</span>
+            </div>
+            <div className="info-item blinds-info">
+              <span className="info-label">Blinds</span>
+              <span className="info-value">
+                {formatBettingAmount(gameSettings.smallBlind, gameSettings.bigBlind, gameSettings.bettingDisplayMode)}/
+                {formatBettingAmount(gameSettings.bigBlind, gameSettings.bigBlind, gameSettings.bettingDisplayMode)}
+              </span>
+            </div>
+            <div className="info-item dealer-info">
+              <span className="info-label">Dealer</span>
+              <span className="info-value">P{gameState.dealerPosition + 1}</span>
+            </div>
+            <div className="info-item hand-info">
+              <span className="info-label">Hand</span>
+              <span className="info-value">#{gameState.handNumber}</span>
+            </div>
+            <div className="info-item settings-info">
+              <button 
+                className="settings-button"
+                onClick={() => setShowSettings(true)}
+                title="Game Settings"
+              >
+                ⚙️ Settings
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -79,7 +123,7 @@ export function PokerGame() {
               <div className="pot-display">
                 <div className="pot-label">Pot</div>
                 <div className={`pot-amount ${isUpdating ? 'updating' : ''}`}>
-                  {`$${currentPotSize.toLocaleString()}`}
+                  {formattedPotAmount}
                 </div>
               </div>
             </div>
@@ -107,6 +151,15 @@ export function PokerGame() {
           <GameTabs />
         </div>
       </div>
+
+      {/* Game Settings Modal */}
+      <GameSettings
+        currentSettings={gameSettings}
+        onSettingsChange={handleSettingsChange}
+        onResetSession={resetSession}
+        onClose={() => setShowSettings(false)}
+        isOpen={showSettings}
+      />
     </div>
   );
 }

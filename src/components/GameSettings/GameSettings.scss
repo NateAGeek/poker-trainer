@@ -1,0 +1,388 @@
+.game-settings-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.game-settings-modal {
+  background: #1a1a1a;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+}
+
+.game-settings-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #333;
+  background: #222;
+
+  h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 1.5rem;
+    font-weight: 600;
+  }
+
+  .close-button {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 1.5rem;
+    cursor: pointer;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background: #333;
+      color: #fff;
+    }
+  }
+}
+
+.game-settings-tabs {
+  display: flex;
+  background: #222;
+  border-bottom: 1px solid #333;
+
+  .tab {
+    flex: 1;
+    padding: 1rem;
+    background: none;
+    border: none;
+    color: #888;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border-bottom: 2px solid transparent;
+
+    &:hover {
+      background: #2a2a2a;
+      color: #fff;
+    }
+
+    &.active {
+      color: #4CAF50;
+      border-bottom-color: #4CAF50;
+      background: #1a1a1a;
+    }
+  }
+}
+
+.game-settings-content {
+  padding: 2rem;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.setting-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    font-size: 0.9rem;
+  }
+
+  input[type="number"], select {
+    width: 100%;
+    padding: 0.75rem;
+    background: #333;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+    font-size: 0.9rem;
+
+    &:focus {
+      outline: none;
+      border-color: #4CAF50;
+      box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+    }
+  }
+}
+
+.game-type-buttons, .betting-display-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+}
+
+.game-type-btn, .betting-display-btn {
+  padding: 0.75rem 1rem;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+
+  &:hover {
+    background: #3a3a3a;
+    border-color: #555;
+  }
+
+  &.active {
+    background: #4CAF50;
+    border-color: #4CAF50;
+    color: #fff;
+  }
+}
+
+.blinds-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.preset-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #333;
+
+  h3 {
+    color: #fff;
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.preset-buttons {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.preset-btn {
+  padding: 1rem;
+  background: #333;
+  border: 1px solid #444;
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+
+  &:hover {
+    background: #3a3a3a;
+    border-color: #555;
+  }
+
+  .preset-details {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 0.25rem;
+  }
+}
+
+.stack-info {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #222;
+  border-radius: 8px;
+
+  h4 {
+    margin: 0 0 1rem 0;
+    color: #fff;
+    font-size: 1rem;
+  }
+}
+
+.stack-stats {
+  display: grid;
+  gap: 0.75rem;
+
+  .stat {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .label {
+      color: #888;
+      font-size: 0.9rem;
+    }
+
+    .value {
+      color: #fff;
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+.blind-levels-section {
+  h3 {
+    color: #fff;
+    margin: 0 0 1rem 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+  }
+}
+
+.blind-levels {
+  display: grid;
+  gap: 0.5rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.blind-level {
+  padding: 0.75rem;
+  background: #333;
+  border-radius: 6px;
+
+  .level-header {
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.9rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .level-details {
+    color: #888;
+    font-size: 0.8rem;
+  }
+}
+
+.feature-toggles {
+  display: grid;
+  gap: 0.75rem;
+
+  .toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    color: #fff;
+    font-size: 0.9rem;
+
+    input[type="checkbox"] {
+      width: auto;
+      margin: 0;
+    }
+
+    small {
+      color: #888;
+      font-size: 0.8rem;
+      margin-left: auto;
+    }
+  }
+}
+
+.game-settings-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #333;
+  background: #222;
+
+  button {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+  }
+
+  .cancel-btn {
+    background: #444;
+    color: #fff;
+
+    &:hover {
+      background: #555;
+    }
+  }
+
+  .save-btn {
+    background: #4CAF50;
+    color: #fff;
+
+    &:hover {
+      background: #45a049;
+    }
+  }
+}
+
+/* Session controls */
+.session-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .reset-session-btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    
+    &.danger {
+      background: #f44336;
+      color: #fff;
+      
+      &:hover {
+        background: #da190b;
+      }
+    }
+  }
+
+  small {
+    color: #888;
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .game-settings-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .game-settings-content {
+    padding: 1.5rem;
+  }
+
+  .game-settings-header {
+    padding: 1rem 1.5rem;
+  }
+
+  .game-settings-footer {
+    padding: 1rem 1.5rem;
+  }
+
+  .blinds-row {
+    grid-template-columns: 1fr;
+  }
+
+  .game-type-buttons, .betting-display-buttons {
+    grid-template-columns: 1fr;
+  }
+}

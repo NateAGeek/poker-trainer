@@ -5,6 +5,47 @@
   .range-dropdown-container {
     margin-bottom: $spacing-3;
 
+    .range-info {
+      margin-top: $spacing-2;
+      padding: $spacing-2;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: $border-radius-sm;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+
+      .range-description {
+        color: rgba(255, 255, 255, 0.8);
+        font-size: $font-size-xs;
+        line-height: $line-height-relaxed;
+      }
+    }
+
+    .delete-range-btn {
+      background: rgba($color-danger, 0.8);
+      color: $color-white;
+      border: none;
+      padding: $spacing-1 $spacing-2;
+      border-radius: $border-radius-sm;
+      font-size: $font-size-xs;
+      font-weight: $font-weight-medium;
+      cursor: pointer;
+      transition: $transition-all;
+      margin-top: $spacing-2;
+
+      &:hover {
+        background: $color-danger;
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+
+      @media (max-width: $breakpoint-sm) {
+        padding: $spacing-1;
+        font-size: 10px;
+      }
+    }
+
     .range-dropdown {
       width: 100%;
       background: rgba(255, 255, 255, 0.1);
@@ -16,6 +57,11 @@
       font-family: $font-family-sans;
       cursor: pointer;
       transition: $transition-colors;
+
+      // Force dark theme
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
 
       &:focus {
         outline: none;
@@ -46,8 +92,17 @@
         }
       }
 
-      // Custom arrow styling
-      appearance: none;
+      optgroup {
+        background: $color-gray-800;
+        color: $color-white;
+        font-weight: $font-weight-medium;
+        
+        &:first-child {
+          margin-top: 0;
+        }
+      }
+
+      // Custom arrow styling - moved after optgroup
       background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6,9 12,15 18,9'%3e%3c/polyline%3e%3c/svg%3e");
       background-repeat: no-repeat;
       background-position: right $spacing-2 center;
@@ -76,8 +131,15 @@
       justify-content: space-between;
       gap: $spacing-3;
 
+      .range-actions {
+        display: flex;
+        gap: $spacing-2;
+        align-items: center;
+      }
+
+      .save-range-btn,
       .clear-range-btn {
-        background: rgba($color-danger, 0.8);
+        background: rgba($color-accent, 0.8);
         color: $color-white;
         border: none;
         padding: $spacing-1 $spacing-2;
@@ -88,7 +150,7 @@
         transition: $transition-all;
 
         &:hover {
-          background: $color-danger;
+          background: $color-accent;
           transform: translateY(-1px);
         }
 
@@ -102,10 +164,98 @@
         }
       }
 
+      .clear-range-btn {
+        background: rgba($color-danger, 0.8);
+
+        &:hover {
+          background: $color-danger;
+        }
+      }
+
       @media (max-width: $breakpoint-sm) {
         flex-direction: column;
         align-items: flex-start;
         gap: $spacing-2;
+      }
+    }
+
+    .save-input-container {
+      display: flex;
+      gap: $spacing-2;
+      align-items: center;
+      flex-wrap: wrap;
+
+      .save-range-input {
+        flex: 1;
+        min-width: 200px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        color: $color-white;
+        padding: $spacing-2;
+        border-radius: $border-radius-sm;
+        font-size: $font-size-sm;
+        
+        &:focus {
+          outline: none;
+          border-color: $color-accent;
+          background: rgba(255, 255, 255, 0.15);
+          box-shadow: 0 0 0 2px rgba($color-accent, 0.2);
+        }
+
+        &::placeholder {
+          color: rgba(255, 255, 255, 0.5);
+        }
+      }
+
+      .save-confirm-btn,
+      .save-cancel-btn {
+        background: rgba($color-accent, 0.8);
+        color: $color-white;
+        border: none;
+        padding: $spacing-2 $spacing-3;
+        border-radius: $border-radius-sm;
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        cursor: pointer;
+        transition: $transition-all;
+        white-space: nowrap;
+
+        &:hover {
+          background: $color-accent;
+          transform: translateY(-1px);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+
+        &:disabled {
+          background: rgba(255, 255, 255, 0.1);
+          color: rgba(255, 255, 255, 0.4);
+          cursor: not-allowed;
+          transform: none;
+
+          &:hover {
+            transform: none;
+          }
+        }
+      }
+
+      .save-cancel-btn {
+        background: rgba($color-danger, 0.8);
+
+        &:hover:not(:disabled) {
+          background: $color-danger;
+        }
+      }
+
+      @media (max-width: $breakpoint-sm) {
+        flex-direction: column;
+        align-items: stretch;
+
+        .save-range-input {
+          min-width: unset;
+        }
       }
     }
 

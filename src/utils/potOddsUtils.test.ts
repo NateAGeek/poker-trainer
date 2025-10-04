@@ -126,6 +126,7 @@ describe('Pot Odds Calculations', () => {
     isHuman,
     hasFolded: false,
     isAllIn: false,
+    isEliminated: false,
     isDealer: false,
     position: 'early',
     lastAction: undefined

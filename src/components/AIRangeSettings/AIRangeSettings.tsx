@@ -1,7 +1,8 @@
-import { useState, useCallback, useMemo } from 'react';
-import { RangeMatrix, type PredefinedRange } from '../RangeMatrix/RangeMatrix';
-import { PREDEFINED_AI_RANGES, loadCustomAIRanges, saveCustomAIRange, deleteCustomAIRange } from '../../utils/aiRangeUtils';
-import type { AIRange, AIPersonality } from '../../types/poker';
+import React, { useState, useEffect, useRef } from 'react';
+import { RangeMatrix, getPredefinedRanges, getSavedRanges, saveCustomRange, deleteCustomRange } from '../RangeMatrix';
+import { RangeSelector } from '../GameTabs/GTOStatsTab/RangeSelector';
+import type { PredefinedRange } from '../RangeMatrix';
+import type { AIPersonality } from '../../types/poker';
 import './AIRangeSettings.scss';
 
 interface AIRangeSettingsProps {
@@ -10,182 +11,174 @@ interface AIRangeSettingsProps {
 }
 
 export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRangeSettingsProps) {
-  // Always use first AI player (index 0)
-  const selectedPlayerIndex = 0;
+  const [selectedAIIndex, setSelectedAIIndex] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<'preflop' | 'postflop'>('preflop');
-  const [showRangeSelector, setShowRangeSelector] = useState(false);
-  const [customRangeName, setCustomRangeName] = useState('');
-  const [isCreatingCustomRange, setIsCreatingCustomRange] = useState(false);
-  const [isEditingRange, setIsEditingRange] = useState(false);
-  const [editingRangeName, setEditingRangeName] = useState<string>('');
-  const [editingRange, setEditingRange] = useState<PredefinedRange | undefined>(undefined);
-  const [refreshKey, setRefreshKey] = useState(0); // Force re-render when custom ranges change
+  const [selectedRangeKey, setSelectedRangeKey] = useState<string>('customRange');
+  const [showFrequencies, setShowFrequencies] = useState(false);
+  const [showActions, setShowActions] = useState(true);
+  const [customRange, setCustomRange] = useState<PredefinedRange | undefined>(undefined);
+  const [refreshKey, setRefreshKey] = useState(0); // Force re-render when ranges change
+  const isLoadingRef = useRef(false); // Prevent infinite loops when loading
 
-  const selectedPersonality = personalities[selectedPlayerIndex];
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const customAIRanges = useMemo(() => loadCustomAIRanges(), [refreshKey]);
-  const allAIRanges = useMemo(() => ({ ...PREDEFINED_AI_RANGES, ...customAIRanges }), [customAIRanges]);
+  const predefinedRanges = React.useMemo(() => getPredefinedRanges(), []);
+  const savedRanges = React.useMemo(() => getSavedRanges(), [refreshKey]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Convert AI range to PredefinedRange for RangeMatrix
-  const convertAIRangeToPredefinedRange = useCallback((aiRange: AIRange): PredefinedRange => {
-    return {
-      name: aiRange.name,
-      description: `AI Range: ${aiRange.name}`,
-      hands: aiRange.hands.map(hand => ({
-        hand: hand.hand,
-        frequency: hand.frequency,
-        action: hand.action
-      })),
-      color: '#3b82f6'
-    };
-  }, []);
+  // Load the selected AI player's range when selection changes
+  useEffect(() => {
+    if (isLoadingRef.current) return; // Skip if already loading
+    isLoadingRef.current = true;
+    const selectedAI = personalities[selectedAIIndex];
+    if (selectedAI?.customRanges?.preflop) {
+      // Convert AIRange to PredefinedRange format
+      const aiRange = selectedAI.customRanges.preflop;
+      setCustomRange({
+        name: aiRange.name,
+        description: `Custom range for ${selectedAI.name || `AI Player ${selectedAIIndex + 1}`}`,
+        color: "#6b7280",
+        hands: aiRange.hands
+      });
+      setSelectedRangeKey('customRange');
+    } else if (selectedAI?.preflopRange) {
+      // Load predefined range if set
+      setSelectedRangeKey(selectedAI.preflopRange);
+      setCustomRange(undefined);
+    } else {
+      // Reset to default
+      setSelectedRangeKey('customRange');
+      setCustomRange(undefined);
+    }
+    
+    // Reset loading flag after a short delay
+    setTimeout(() => {
+      isLoadingRef.current = false;
+    }, 100);
+  }, [selectedAIIndex, personalities]);
 
-  const updatePersonality = useCallback((index: number, updates: Partial<AIPersonality>) => {
-    const newPersonalities = [...personalities];
-    newPersonalities[index] = { ...newPersonalities[index], ...updates };
-    onPersonalitiesChange(newPersonalities);
-  }, [personalities, onPersonalitiesChange]);
-
-  const handlePredefinedRangeSelect = useCallback((rangeKey: string) => {
-    updatePersonality(selectedPlayerIndex, {
-      preflopRange: rangeKey,
-      customRanges: {
-        ...selectedPersonality?.customRanges,
-        preflop: undefined // Clear custom range when selecting predefined
-      }
-    });
-    setShowRangeSelector(false);
-  }, [selectedPlayerIndex, selectedPersonality?.customRanges, updatePersonality]);
-
-  // Start creating a new custom range
-  const handleCustomRangeCreate = useCallback(() => {
-    if (!customRangeName.trim()) return;
-
-    setEditingRangeName(customRangeName);
-    setEditingRange(undefined); // Start with empty range
-    setIsEditingRange(true);
-    setIsCreatingCustomRange(false);
-    setShowRangeSelector(false);
-  }, [customRangeName]);
-
-  // Start editing an existing range (predefined or custom)
-  const handleEditRange = useCallback((rangeKey: string) => {
-    const range = allAIRanges[rangeKey];
-    if (!range) return;
-
-    setEditingRangeName(range.name);
-    setEditingRange(convertAIRangeToPredefinedRange(range));
-    setIsEditingRange(true);
-    setShowRangeSelector(false);
-  }, [allAIRanges, convertAIRangeToPredefinedRange]);
-
-  const handleSaveCustomRange = useCallback(() => {
-    if (!editingRangeName.trim()) return;
-    if (!editingRange || editingRange.hands.length === 0) return;
-
-    const finalRange: AIRange = {
-      name: editingRangeName,
-      hands: editingRange.hands.map(h => ({
+  // Save the current range to the selected AI player
+  const saveRangeToAI = (range: PredefinedRange) => {
+    const updatedPersonalities = [...personalities];
+    const aiRange = {
+      name: range.name,
+      hands: range.hands.map(h => ({
         hand: h.hand,
         frequency: h.frequency,
-        action: (h.action || 'call') as 'fold' | 'call' | 'raise'
+        action: (h.action === 'bet' ? 'raise' : h.action || 'fold') as 'fold' | 'call' | 'raise'
       }))
     };
-
-    // Save to storage
-    saveCustomAIRange(editingRangeName, finalRange);
-
-    // Apply to current personality
-    updatePersonality(selectedPlayerIndex, {
-      preflopRange: undefined,
-      customRanges: {
-        ...selectedPersonality?.customRanges,
-        preflop: finalRange
-      }
-    });
-
-    // Reset editing state
-    setIsEditingRange(false);
-    setEditingRangeName('');
-    setEditingRange(undefined);
-    setCustomRangeName('');
     
-    // Force refresh to reload custom ranges from localStorage
-    setRefreshKey(prev => prev + 1);
-  }, [editingRangeName, editingRange, selectedPlayerIndex, selectedPersonality?.customRanges, updatePersonality]);
-
-  const handleCancelCustomRange = useCallback(() => {
-    setIsEditingRange(false);
-    setEditingRangeName('');
-    setEditingRange(undefined);
-    setCustomRangeName('');
-    setIsCreatingCustomRange(false);
-  }, []);
-
-  const handleCustomRangeDelete = useCallback((rangeName: string) => {
-    deleteCustomAIRange(rangeName);
-    // If this range was being used by any AI player, clear it
-    const updatedPersonalities = personalities.map(personality => {
-      if (personality.customRanges?.preflop?.name === rangeName) {
-        return {
-          ...personality,
-          customRanges: {
-            ...personality.customRanges,
-            preflop: undefined
-          }
-        };
-      }
-      return personality;
-    });
-    
-    // Only update if there were changes
-    if (updatedPersonalities.some((p, i) => p !== personalities[i])) {
-      onPersonalitiesChange(updatedPersonalities);
+    if (!updatedPersonalities[selectedAIIndex].customRanges) {
+      updatedPersonalities[selectedAIIndex].customRanges = {};
     }
+    updatedPersonalities[selectedAIIndex].customRanges!.preflop = aiRange;
     
-    // Force refresh to reload custom ranges from localStorage
-    setRefreshKey(prev => prev + 1);
-  }, [personalities, onPersonalitiesChange]);
-
-  // Safety check - if no personalities or invalid index, don't render
-  if (!personalities.length || !selectedPersonality) {
-    return (
-      <div className="ai-range-settings">
-        <div className="no-ai-players">
-          <p>No AI players available to configure.</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Get current range for display
-  const getCurrentRange = (): PredefinedRange | undefined => {
-    if (activeTab === 'preflop') {
-      // If we're editing a range, show the editing range
-      if (isEditingRange && editingRange) {
-        return editingRange;
-      }
-      
-      // Show custom range if set
-      if (selectedPersonality.customRanges?.preflop) {
-        return convertAIRangeToPredefinedRange(selectedPersonality.customRanges.preflop);
-      }
-      
-      // Show predefined range if set
-      if (selectedPersonality.preflopRange && allAIRanges[selectedPersonality.preflopRange]) {
-        return convertAIRangeToPredefinedRange(allAIRanges[selectedPersonality.preflopRange]);
-      }
-    }
-    return undefined;
+    onPersonalitiesChange(updatedPersonalities);
   };
 
-  const currentRange = getCurrentRange();
+  const handleRangeChange = (rangeKey: string) => {
+    setSelectedRangeKey(rangeKey);
+    // Clear custom range when switching away from custom range
+    if (rangeKey !== 'customRange') {
+      setCustomRange(undefined);
+    }
+  };
+
+  const handleClearCustomRange = () => {
+    setCustomRange(undefined);
+    // Clear from AI player as well
+    const updatedPersonalities = [...personalities];
+    if (updatedPersonalities[selectedAIIndex].customRanges) {
+      delete updatedPersonalities[selectedAIIndex].customRanges!.preflop;
+    }
+    onPersonalitiesChange(updatedPersonalities);
+  };
+
+  // Handler that saves changes to both local state and the AI player
+  const handleCustomRangeChange = (range: PredefinedRange | undefined) => {
+    if (isLoadingRef.current) return; // Don't save while loading
+    setCustomRange(range);
+    if (range) {
+      saveRangeToAI(range);
+    }
+  };
+
+  const handleSaveCustomRange = (name: string) => {
+    if (customRange && customRange.hands.length > 0) {
+      const rangeToSave: PredefinedRange = {
+        ...customRange,
+        name,
+        description: `Custom saved range with ${customRange.hands.length} hands`
+      };
+      
+      try {
+        saveCustomRange(name, rangeToSave);
+        setRefreshKey(prev => prev + 1); // Force re-render to show new saved range
+        alert(`Range "${name}" saved successfully!`);
+      } catch (error) {
+        alert(`Error saving range: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
+  };
+
+  const handleDeleteRange = (key: string) => {
+    if (key.startsWith('saved_')) {
+      try {
+        deleteCustomRange(key);
+        setRefreshKey(prev => prev + 1); // Force re-render to remove deleted range
+        if (selectedRangeKey === key) {
+          setSelectedRangeKey('customRange'); // Switch to custom range if deleted range was selected
+        }
+        alert('Range deleted successfully!');
+      } catch (error) {
+        alert(`Error deleting range: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      }
+    }
+  };
+
+  const selectedRange: PredefinedRange | undefined = React.useMemo(() => {
+    if (selectedRangeKey === 'customRange') {
+      // Use customRange state or return placeholder
+      return customRange || {
+        name: "Custom Range (Click hands to select)",
+        description: "Build your own custom range by clicking on hands in the matrix",
+        color: "#6b7280",
+        hands: []
+      };
+    }
+    
+    // Check predefined ranges first
+    if (predefinedRanges[selectedRangeKey]) {
+      return predefinedRanges[selectedRangeKey];
+    }
+    
+    // Check saved ranges
+    if (savedRanges[selectedRangeKey]) {
+      return savedRanges[selectedRangeKey];
+    }
+    
+    return undefined;
+  }, [selectedRangeKey, customRange, predefinedRanges, savedRanges]);
 
   return (
     <div className="ai-range-settings">
       <div className="ai-range-header">
         <h3>Range Manager</h3>
         <p>Create and edit poker ranges for AI players</p>
+      </div>
+
+      <div className="ai-player-selector">
+        <label htmlFor="ai-player-select">Select AI Player:</label>
+        <select 
+          id="ai-player-select"
+          value={selectedAIIndex}
+          onChange={(e) => setSelectedAIIndex(Number(e.target.value))}
+          className="ai-player-dropdown"
+        >
+          {personalities.map((personality, index) => (
+            <option key={index} value={index}>
+              {personality.name || `AI Player ${index + 1}`}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div className="range-tabs">
@@ -208,151 +201,89 @@ export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRang
       <div className="range-content">
         {activeTab === 'preflop' && (
           <div className="preflop-range-settings">
-            <div className="range-selection">
-              <div className="current-range-info">
-                <h4>Available Ranges</h4>
-                <p>Select a range to edit or create a new custom range</p>
-              </div>
+            <RangeSelector
+              selectedRangeKey={selectedRangeKey}
+              onRangeChange={handleRangeChange}
+              showFrequencies={showFrequencies}
+              onShowFrequenciesChange={setShowFrequencies}
+              showActions={showActions}
+              onShowActionsChange={setShowActions}
+              customRangeCount={customRange?.hands.length || 0}
+              onClearCustomRange={handleClearCustomRange}
+              onSaveCustomRange={handleSaveCustomRange}
+              onDeleteRange={handleDeleteRange}
+            />
 
-              <button 
-                className="select-range-btn"
-                onClick={() => setShowRangeSelector(!showRangeSelector)}
-              >
-                {showRangeSelector ? 'Hide Ranges' : 'Show Ranges'}
-              </button>
+            {selectedRangeKey !== 'customRange' && selectedRange && (
+              <div className="apply-range-actions">
+                <button 
+                  className="apply-range-button"
+                  onClick={() => {
+                    if (selectedRange) {
+                      saveRangeToAI(selectedRange);
+                      alert(`Applied "${selectedRange.name}" to ${personalities[selectedAIIndex].name || `AI Player ${selectedAIIndex + 1}`}`);
+                    }
+                  }}
+                >
+                  Apply "{selectedRange.name}" to {personalities[selectedAIIndex].name || `AI Player ${selectedAIIndex + 1}`}
+                </button>
+              </div>
+            )}
+
+            <div className="range-matrix-container">
+              <RangeMatrix
+                selectedRange={selectedRangeKey !== 'customRange' ? selectedRange : customRange}
+                showFrequencies={showFrequencies}
+                showActions={showActions}
+                isEditable={selectedRangeKey === 'customRange'}
+                editMode="select"
+                onRangeChange={selectedRangeKey === 'customRange' ? handleCustomRangeChange : undefined}
+              />
             </div>
 
-            {showRangeSelector && (
-              <div className="range-selector">
-                <div className="predefined-ranges">
-                  <h5>Predefined Ranges</h5>
-                  <div className="range-options">
-                    {Object.entries(allAIRanges).map(([key, range]) => (
-                      <div key={key} className="range-option">
-                        <button
-                          className="range-option-btn"
-                          onClick={() => handlePredefinedRangeSelect(key)}
-                        >
-                          <span className="range-name">{range.name}</span>
-                          <span className="range-hands-count">
-                            {range.hands.length} hands
-                          </span>
-                        </button>
-                        <button
-                          className="edit-range-btn"
-                          onClick={() => handleEditRange(key)}
-                          title="Edit this range"
-                        >
-                          ✎
-                        </button>
-                        {customAIRanges[key] && (
-                          <button
-                            className="delete-range-btn"
-                            onClick={() => handleCustomRangeDelete(key)}
-                            title="Delete this range"
-                          >
-                            ✕
-                          </button>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="custom-range-creator">
-                  <h5>Create Custom Range</h5>
-                  {!isCreatingCustomRange ? (
-                    <button
-                      className="create-custom-btn"
-                      onClick={() => setIsCreatingCustomRange(true)}
-                    >
-                      Create New Range
-                    </button>
-                  ) : (
-                    <div className="custom-range-form">
-                      <input
-                        type="text"
-                        placeholder="Range name"
-                        value={customRangeName}
-                        onChange={(e) => setCustomRangeName(e.target.value)}
-                      />
-                      <div className="form-actions">
-                        <button onClick={handleCustomRangeCreate}>Start Editing</button>
-                        <button onClick={() => {
-                          setIsCreatingCustomRange(false);
-                          setCustomRangeName('');
-                        }}>
-                          Cancel
-                        </button>
-                      </div>
+            <div className="range-stats stats-card">
+              <h4>Range Statistics</h4>
+              {selectedRange && (
+                <div className="stats-content">
+                  <div className="stat-row">
+                    <div className="stat-item">
+                      <label>Range Size:</label>
+                      <span className="stat-value">{selectedRange.hands.length} hands</span>
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {isEditingRange && editingRangeName && (
-              <div className="custom-range-editor">
-                <div className="editor-header">
-                  <h4>Editing Range: {editingRangeName}</h4>
-                  <p>Click hands to cycle: Add (Raise) → Call → Fold → Remove</p>
-                </div>
-                
-                <div className="editor-controls">
-                  <div className="control-group">
-                    <span className="hands-count">Selected: {editingRange?.hands.length || 0} hands</span>
-                  </div>
-                  <div className="control-group">
-                    <span className="info-text">💡 First click: Raise → Call → Fold → Remove</span>
-                  </div>
-                </div>
-                
-                <div className="editor-actions">
-                  <button className="save-btn" onClick={handleSaveCustomRange} disabled={!editingRange || editingRange.hands.length === 0}>
-                    Save Range
-                  </button>
-                  <button className="cancel-btn" onClick={handleCancelCustomRange}>
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {currentRange && (
-              <div className="range-visualization">
-                <h4>Range Visualization</h4>
-                <RangeMatrix
-                  selectedRange={isEditingRange ? editingRange : currentRange}
-                  showFrequencies={false}
-                  showActions={true}
-                  isEditable={isEditingRange}
-                  editMode="select"
-                  onRangeChange={isEditingRange ? setEditingRange : undefined}
-                  className="ai-range-matrix"
-                />
-                <div className="range-stats">
-                  <div className="stat">
-                    <span className="label">Total Hands:</span>
-                    <span className="value">{currentRange.hands.length}</span>
-                  </div>
-                  <div className="stat">
-                    <span className="label">Avg Frequency:</span>
-                    <span className="value">
-                      {currentRange.hands.length > 0 
-                        ? (currentRange.hands.reduce((sum, hand) => sum + hand.frequency, 0) / currentRange.hands.length * 100).toFixed(1)
-                        : '0'
-                      }%
-                    </span>
+                    <div className="stat-item">
+                      <label>Total Combinations:</label>
+                      <span className="stat-value">
+                        {selectedRange.hands.reduce((total: number, hand) => {
+                          let combos = 0;
+                          if (hand.hand.length === 2) {
+                            combos = 6;
+                          } else if (hand.hand.endsWith('s')) {
+                            combos = 4;
+                          } else {
+                            combos = 12;
+                          }
+                          return total + (combos * hand.frequency);
+                        }, 0).toFixed(1)}
+                      </span>
+                    </div>
+                    <div className="stat-item">
+                      <label>Range %:</label>
+                      <span className="stat-value percentage-value">
+                        {(
+                          (selectedRange.hands.reduce((total: number, hand) => {
+                            let combos = 0;
+                            if (hand.hand.length === 2) combos = 6;
+                            else if (hand.hand.endsWith('s')) combos = 4;
+                            else combos = 12;
+                            return total + (combos * hand.frequency);
+                          }, 0) / 1326) * 100
+                        ).toFixed(1)}%
+                      </span>
+                    </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {!currentRange && !isEditingRange && (
-              <div className="no-range-message">
-                <p>No range selected. Choose a predefined range or create a custom one.</p>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
@@ -370,4 +301,4 @@ export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRang
       </div>
     </div>
   );
-}
+};

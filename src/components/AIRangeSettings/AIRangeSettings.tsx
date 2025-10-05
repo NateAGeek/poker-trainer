@@ -6,11 +6,11 @@ import type { AIPersonality } from '../../types/poker';
 import './AIRangeSettings.scss';
 
 interface AIRangeSettingsProps {
-  personalities: AIPersonality[];
-  onPersonalitiesChange: (personalities: AIPersonality[]) => void;
+  aiPlayers: AIPersonality[];
+  onAIPlayersChange: (aiPlayers: AIPersonality[]) => void;
 }
 
-export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRangeSettingsProps) {
+export function AIRangeSettings({ aiPlayers, onAIPlayersChange }: AIRangeSettingsProps) {
   const [selectedAIIndex, setSelectedAIIndex] = useState<number>(0);
   const [activeTab, setActiveTab] = useState<'preflop' | 'postflop'>('preflop');
   const [selectedRangeKey, setSelectedRangeKey] = useState<string>('customRange');
@@ -27,36 +27,46 @@ export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRang
   useEffect(() => {
     if (isLoadingRef.current) return; // Skip if already loading
     isLoadingRef.current = true;
-    const selectedAI = personalities[selectedAIIndex];
+    const selectedAI = aiPlayers[selectedAIIndex];
     if (selectedAI?.customRanges?.preflop) {
       // Convert AIRange to PredefinedRange format
       const aiRange = selectedAI.customRanges.preflop;
       setCustomRange({
         name: aiRange.name,
-        description: `Custom range for ${selectedAI.name || `AI Player ${selectedAIIndex + 1}`}`,
+        description: `Custom range for AI Player ${selectedAIIndex + 2}`,
         color: "#6b7280",
         hands: aiRange.hands
       });
       setSelectedRangeKey('customRange');
     } else if (selectedAI?.preflopRange) {
-      // Load predefined range if set
+      // Load predefined range if set (e.g., 'tight', 'premium', etc.)
       setSelectedRangeKey(selectedAI.preflopRange);
       setCustomRange(undefined);
+      // Also update the AI player to have this as their preflopRange if not set
+      if (!selectedAI.preflopRange) {
+        const updatedPlayers = [...aiPlayers];
+        updatedPlayers[selectedAIIndex].preflopRange = selectedAI.preflopRange;
+        onAIPlayersChange(updatedPlayers);
+      }
     } else {
-      // Reset to default
-      setSelectedRangeKey('customRange');
+      // Reset to default - all hands (loose range)
+      // Set looseRange as the preflopRange for this AI player
+      const updatedPlayers = [...aiPlayers];
+      updatedPlayers[selectedAIIndex].preflopRange = 'looseRange';
+      setSelectedRangeKey('looseRange');
       setCustomRange(undefined);
+      onAIPlayersChange(updatedPlayers);
     }
     
     // Reset loading flag after a short delay
     setTimeout(() => {
       isLoadingRef.current = false;
     }, 100);
-  }, [selectedAIIndex, personalities]);
+  }, [selectedAIIndex, aiPlayers, onAIPlayersChange]);
 
   // Save the current range to the selected AI player
   const saveRangeToAI = (range: PredefinedRange) => {
-    const updatedPersonalities = [...personalities];
+    const updatedPlayers = [...aiPlayers];
     const aiRange = {
       name: range.name,
       hands: range.hands.map(h => ({
@@ -66,12 +76,12 @@ export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRang
       }))
     };
     
-    if (!updatedPersonalities[selectedAIIndex].customRanges) {
-      updatedPersonalities[selectedAIIndex].customRanges = {};
+    if (!updatedPlayers[selectedAIIndex].customRanges) {
+      updatedPlayers[selectedAIIndex].customRanges = {};
     }
-    updatedPersonalities[selectedAIIndex].customRanges!.preflop = aiRange;
+    updatedPlayers[selectedAIIndex].customRanges!.preflop = aiRange;
     
-    onPersonalitiesChange(updatedPersonalities);
+    onAIPlayersChange(updatedPlayers);
   };
 
   const handleRangeChange = (rangeKey: string) => {
@@ -85,11 +95,11 @@ export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRang
   const handleClearCustomRange = () => {
     setCustomRange(undefined);
     // Clear from AI player as well
-    const updatedPersonalities = [...personalities];
-    if (updatedPersonalities[selectedAIIndex].customRanges) {
-      delete updatedPersonalities[selectedAIIndex].customRanges!.preflop;
+    const updatedPlayers = [...aiPlayers];
+    if (updatedPlayers[selectedAIIndex].customRanges) {
+      delete updatedPlayers[selectedAIIndex].customRanges!.preflop;
     }
-    onPersonalitiesChange(updatedPersonalities);
+    onAIPlayersChange(updatedPlayers);
   };
 
   // Handler that saves changes to both local state and the AI player
@@ -173,9 +183,9 @@ export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRang
           onChange={(e) => setSelectedAIIndex(Number(e.target.value))}
           className="ai-player-dropdown"
         >
-          {personalities.map((personality, index) => (
+          {aiPlayers.map((_player, index) => (
             <option key={index} value={index}>
-              {personality.name || `AI Player ${index + 1}`}
+              AI Player {index + 2}
             </option>
           ))}
         </select>
@@ -221,11 +231,11 @@ export function AIRangeSettings({ personalities, onPersonalitiesChange }: AIRang
                   onClick={() => {
                     if (selectedRange) {
                       saveRangeToAI(selectedRange);
-                      alert(`Applied "${selectedRange.name}" to ${personalities[selectedAIIndex].name || `AI Player ${selectedAIIndex + 1}`}`);
+                      alert(`Applied "${selectedRange.name}" to AI Player ${selectedAIIndex + 2}`);
                     }
                   }}
                 >
-                  Apply "{selectedRange.name}" to {personalities[selectedAIIndex].name || `AI Player ${selectedAIIndex + 1}`}
+                  Apply "{selectedRange.name}" to AI Player {selectedAIIndex + 2}
                 </button>
               </div>
             )}

@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { GameType, BettingDisplayMode, type GameSettings, type AIPersonality } from '../../types/poker';
-import { AI_PERSONALITIES } from '../../utils/gameUtils';
+import { useAIPlayer } from '../../hooks/useAIPlayer';
 import { AIRangeSettings } from '../AIRangeSettings';
+import { AIInfoPanel } from '../AIInfoPanel';
 import './GameSettings.scss';
 
 interface GameSettingsProps {
@@ -46,25 +47,26 @@ const PRESET_MTT_STRUCTURES = [
 
 export function GameSettings({ currentSettings, onSettingsChange, onResetSession, onClose, isOpen }: GameSettingsProps) {
   const [settings, setSettings] = useState<GameSettings>(currentSettings);
-  const [activeTab, setActiveTab] = useState<'basic' | 'blinds' | 'advanced'>('basic');
+  const [activeTab, setActiveTab] = useState<'basic' | 'blinds' | 'advanced' | 'aiInfo'>('basic');
+  const { personalities } = useAIPlayer();
 
   if (!isOpen) return null;
 
   // Initialize AI personalities if not present
   const initializeAIPersonalities = (playerCount: number): AIPersonality[] => {
-    const personalities: AIPersonality[] = [];
-    const personalityTypes = Object.values(AI_PERSONALITIES);
+    const aiPersonalities: AIPersonality[] = [];
+    const personalityTypes = Object.values(personalities);
     
     // Create AI personalities for players 2 through playerCount (skip player 1 who is human)
     for (let i = 1; i < playerCount; i++) {
       const personalityIndex = (i - 1) % personalityTypes.length;
-      personalities.push({
+      aiPersonalities.push({
         ...personalityTypes[personalityIndex],
         name: `${personalityTypes[personalityIndex].name} ${i + 1}` // Player numbers 2, 3, 4, etc.
       });
     }
     
-    return personalities;
+    return aiPersonalities;
   };
 
   // Ensure AI personalities are initialized
@@ -154,6 +156,12 @@ export function GameSettings({ currentSettings, onSettingsChange, onResetSession
             onClick={() => setActiveTab('advanced')}
           >
             Advanced
+          </button>
+          <button 
+            className={`tab ${activeTab === 'aiInfo' ? 'active' : ''}`}
+            onClick={() => setActiveTab('aiInfo')}
+          >
+            AI Info
           </button>
         </div>
 
@@ -352,8 +360,8 @@ export function GameSettings({ currentSettings, onSettingsChange, onResetSession
                 <label>AI Player Configuration</label>
                 {settings.aiPersonalities && settings.aiPersonalities.length > 0 ? (
                   <AIRangeSettings
-                    personalities={settings.aiPersonalities}
-                    onPersonalitiesChange={handleAIPersonalitiesChange}
+                    aiPlayers={settings.aiPersonalities}
+                    onAIPlayersChange={handleAIPersonalitiesChange}
                   />
                 ) : (
                   <div className="no-ai-players">
@@ -395,6 +403,15 @@ export function GameSettings({ currentSettings, onSettingsChange, onResetSession
                   <small>This will clear all hand history and reset statistics to zero.</small>
                 </div>
               </div>
+            </div>
+          )}
+
+          {activeTab === 'aiInfo' && (
+            <div className="ai-info-settings">
+              <div className="ai-info-description">
+                <p>View real-time information about AI players, their personalities, ranges, and decision-making process.</p>
+              </div>
+              <AIInfoPanel />
             </div>
           )}
         </div>

@@ -359,6 +359,70 @@
   }
 }
 
+/* AI Info Settings */
+.ai-info-settings {
+  .ai-info-description {
+    background: rgba(96, 165, 250, 0.1);
+    border-left: 3px solid #60a5fa;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    border-radius: 4px;
+
+    p {
+      margin: 0;
+      color: #cbd5e1;
+      line-height: 1.5;
+    }
+  }
+
+  // Override AIInfoPanel styles to fit within settings modal
+  .ai-info-panel {
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+    max-width: none;
+
+    .panel-header {
+      border-color: #334155;
+      
+      h3 {
+        font-size: 1.25rem;
+      }
+    }
+
+    // Make the panel more compact in settings
+    .ai-details,
+    .personality-details,
+    .range-info,
+    .hand-info {
+      padding: 0.75rem;
+    }
+
+    .personality-stats .stat {
+      margin-bottom: 0.5rem;
+    }
+
+    .ai-grid {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .ai-card {
+      padding: 0.75rem;
+    }
+
+    .personalities-grid {
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 0.5rem;
+    }
+
+    .personality-card {
+      padding: 0.5rem;
+    }
+  }
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .game-settings-modal {

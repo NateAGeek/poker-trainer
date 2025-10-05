@@ -148,11 +148,14 @@
     }
 
     .action-label {
-      font-size: 8px;
+      font-size: 10px;
       line-height: 1;
       font-weight: $font-weight-bold;
       margin-top: 1px;
       text-transform: uppercase;
+      padding: 1px 3px;
+      border-radius: 2px;
+      background-color: rgba(0, 0, 0, 0.2);
     }
   }
 

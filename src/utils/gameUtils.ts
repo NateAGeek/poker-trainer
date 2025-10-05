@@ -5,6 +5,7 @@
 
 import type { Player, PlayerPosition, PlayerAction, AIPersonality, Card, GameState } from '../types/poker';
 import { PlayerPosition as Pos, PlayerAction as Action } from '../types/poker';
+import { PREDEFINED_AI_RANGES, loadCustomAIRanges } from './aiRangeUtils';
 
 // =========================================
 // POSITION AND BLINDS UTILITIES
@@ -397,16 +398,12 @@ function makeRangeBasedDecision(
   maxBet: number,
   bigBlind: number
 ): { action: PlayerAction; amount?: number } | null {
-  // Import range utilities (we'll need to handle this import properly)
   try {
-    // This would ideally be imported at the top, but for now we'll use dynamic import logic
-    // In a real implementation, we'd reorganize the files to avoid circular dependencies
-    
-    // For now, use a simplified range check
     const handNotation = getSimpleHandNotation(player.hand);
     if (!handNotation) return null;
     
-    const shouldPlay = checkHandInSimpleRange(handNotation, personality);
+    // Use the proper range-based logic
+    const shouldPlay = checkHandAgainstRange(handNotation, personality);
     
     if (!shouldPlay.shouldPlay) {
       if (availableActions.includes(Action.CHECK)) return { action: Action.CHECK };
@@ -475,7 +472,60 @@ function getSimpleHandNotation(cards: Card[]): string | null {
 }
 
 /**
- * Check if hand should be played based on simplified range logic
+ * Check if hand should be played based on AI personality ranges
+ */
+function checkHandAgainstRange(
+  handNotation: string, 
+  personality: AIPersonality
+): { shouldPlay: boolean; action: 'fold' | 'call' | 'raise' } {
+  // Get the AI range for this personality
+  const customAIRanges = loadCustomAIRanges();
+  const allAIRanges = { ...PREDEFINED_AI_RANGES, ...customAIRanges };
+  
+  let aiRange;
+  
+  // Check for custom range first
+  if (personality.customRanges?.preflop) {
+    aiRange = personality.customRanges.preflop;
+  }
+  // Then check for predefined range
+  else if (personality.preflopRange && allAIRanges[personality.preflopRange]) {
+    aiRange = allAIRanges[personality.preflopRange];
+  }
+  
+  // If we have a range, use it
+  if (aiRange) {
+    const rangeEntry = aiRange.hands.find(entry => entry.hand === handNotation);
+    
+    if (rangeEntry) {
+      // Apply personality modifiers to frequency
+      let adjustedFrequency = rangeEntry.frequency;
+      
+      // Tight players play fewer hands
+      if (personality.foldThreshold > 0.6) {
+        adjustedFrequency *= 0.7;
+      }
+      
+      // Loose players play more hands
+      if (personality.foldThreshold < 0.4) {
+        adjustedFrequency = Math.min(1.0, adjustedFrequency * 1.3);
+      }
+      
+      const shouldPlay = Math.random() < adjustedFrequency;
+      
+      return {
+        shouldPlay,
+        action: rangeEntry.action,
+      };
+    }
+  }
+  
+  // Fallback to simple range logic if no custom range or hand not found
+  return checkHandInSimpleRange(handNotation, personality);
+}
+
+/**
+ * Check if hand should be played based on simplified range logic (fallback)
  */
 function checkHandInSimpleRange(
   handNotation: string, 

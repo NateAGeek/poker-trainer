@@ -19,8 +19,15 @@ export interface RangeMatrixProps {
   selectedRange?: PredefinedRange;
   showFrequencies?: boolean;
   showActions?: boolean;
+  // Controlled mode: parent manages selection
   onHandSelect?: (hand: string) => void;
   onHandsBulkSelect?: (hands: string[]) => void;
+  onHandAction?: (hand: string, action: 'call' | 'raise') => void;
+  // Uncontrolled mode: RangeMatrix manages its own state
+  isEditable?: boolean;
+  editMode?: 'select' | 'toggle'; // 'select' = add/remove hands, 'toggle' = cycle through actions
+  onRangeChange?: (range: PredefinedRange) => void; // Called when internal range changes
+  allowRemove?: boolean; // Whether clicking can remove hands (for cycling through fold -> remove)
   className?: string;
 }
 
@@ -46,9 +53,20 @@ export const RangeMatrix: React.FC<RangeMatrixProps> = ({
   showActions = false,
   onHandSelect,
   onHandsBulkSelect,
+  onHandAction,
+  isEditable = false,
+  editMode = 'select',
+  onRangeChange,
+  allowRemove = true,
   className = ''
 }) => {
   const ranks = ['A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'];
+  
+  // Internal state for uncontrolled mode
+  const [internalRange, setInternalRange] = React.useState<Map<string, RangeSelection>>(new Map());
+  
+  // Track if we're syncing from external prop to prevent infinite loops
+  const isSyncingRef = React.useRef(false);
   
   // Drag state management
   const [isDragging, setIsDragging] = React.useState(false);
@@ -56,8 +74,34 @@ export const RangeMatrix: React.FC<RangeMatrixProps> = ({
   const [draggedHands, setDraggedHands] = React.useState<Set<string>>(new Set());
   const [isMouseDown, setIsMouseDown] = React.useState(false);
   
+  // Determine if we're in controlled or uncontrolled mode
+  const isControlled = !!(onHandSelect || onHandsBulkSelect || onHandAction);
+  const isUncontrolled = !isControlled && isEditable;
+  
+  // Sync internal range with selectedRange prop when it changes (for uncontrolled mode)
+  React.useEffect(() => {
+    if (isUncontrolled && selectedRange) {
+      isSyncingRef.current = true;
+      const newMap = new Map<string, RangeSelection>();
+      selectedRange.hands.forEach(hand => {
+        newMap.set(hand.hand, hand);
+      });
+      setInternalRange(newMap);
+      // Reset flag after state update
+      setTimeout(() => {
+        isSyncingRef.current = false;
+      }, 0);
+    }
+  }, [isUncontrolled, selectedRange]);
+  
   // Create a map for quick lookup of range data
   const rangeMap = React.useMemo(() => {
+    // Use internal state in uncontrolled mode
+    if (isUncontrolled) {
+      return internalRange;
+    }
+    
+    // Use selectedRange in controlled mode
     if (!selectedRange) return new Map();
     
     const map = new Map<string, RangeSelection>();
@@ -65,7 +109,20 @@ export const RangeMatrix: React.FC<RangeMatrixProps> = ({
       map.set(selection.hand, selection);
     });
     return map;
-  }, [selectedRange]);
+  }, [selectedRange, internalRange, isUncontrolled]);
+  
+  // Notify parent of range changes in uncontrolled mode (but not during sync from parent)
+  React.useEffect(() => {
+    if (isUncontrolled && onRangeChange && !isSyncingRef.current) {
+      const range: PredefinedRange = {
+        name: 'Custom Range',
+        description: `Custom range with ${internalRange.size} hands`,
+        hands: Array.from(internalRange.values()),
+        color: '#10b981'
+      };
+      onRangeChange(range);
+    }
+  }, [internalRange, isUncontrolled, onRangeChange]);
 
   const getCellClasses = (hand: string): string => {
     const selection = rangeMap.get(hand);
@@ -110,10 +167,11 @@ export const RangeMatrix: React.FC<RangeMatrixProps> = ({
     }
     
     if (showActions && selection) {
+      const actionLabel = selection.action === 'raise' ? 'R' : selection.action === 'call' ? 'C' : 'F';
       return (
         <>
           <div className="hand-label">{hand}</div>
-          <div className="action-label">{selection.action?.toUpperCase()}</div>
+          <div className="action-label">{actionLabel}</div>
         </>
       );
     }
@@ -121,13 +179,68 @@ export const RangeMatrix: React.FC<RangeMatrixProps> = ({
     return hand;
   };
 
-  const handleCellClick = () => {
-    // Prevent click handler from firing during drag operations
-    // The mouse up handler will handle both single clicks and drag completion
-    return;
+  const handleCellClick = (hand: string) => {
+    // Uncontrolled mode - manage state internally
+    if (isUncontrolled) {
+      setInternalRange(prev => {
+        const newMap = new Map(prev);
+        const current = newMap.get(hand);
+        
+        if (editMode === 'toggle' && current) {
+          // Toggle mode: cycle through actions for existing hands
+          const newAction = current.action === 'call' ? 'raise' : 'call';
+          newMap.set(hand, { ...current, action: newAction });
+        } else if (editMode === 'select') {
+          // Select mode: cycle through raise -> call -> fold -> remove (like RangeAnalysis)
+          if (!current) {
+            newMap.set(hand, { hand, frequency: 1.0, action: 'raise' });
+          } else {
+            switch (current.action) {
+              case 'raise':
+                newMap.set(hand, { hand, frequency: 1.0, action: 'call' });
+                break;
+              case 'call':
+                newMap.set(hand, { hand, frequency: 1.0, action: 'fold' });
+                break;
+              case 'fold':
+                if (allowRemove) {
+                  newMap.delete(hand);
+                } else {
+                  newMap.set(hand, { hand, frequency: 1.0, action: 'raise' });
+                }
+                break;
+              default:
+                newMap.set(hand, { hand, frequency: 1.0, action: 'raise' });
+            }
+          }
+        }
+        
+        return newMap;
+      });
+      return;
+    }
+    
+    // Controlled mode - use callbacks
+    if (editMode === 'toggle' && onHandAction && rangeMap.has(hand)) {
+      const selection = rangeMap.get(hand);
+      if (selection) {
+        const newAction = selection.action === 'call' ? 'raise' : 'call';
+        onHandAction(hand, newAction);
+      }
+      return;
+    }
+    
+    if (onHandSelect) {
+      onHandSelect(hand);
+    }
   };
 
   const handleMouseDown = (hand: string) => {
+    // Don't start drag if we're in toggle mode and clicking a selected hand
+    if (editMode === 'toggle' && rangeMap.has(hand)) {
+      return;
+    }
+    
     setIsMouseDown(true);
     setDragStartHand(hand);
     setDraggedHands(new Set([hand]));
@@ -139,17 +252,69 @@ export const RangeMatrix: React.FC<RangeMatrixProps> = ({
       setDraggedHands(prev => new Set([...prev, hand]));
     }
   };
+  
+  // Handle bulk selection in uncontrolled mode
+  const handleBulkSelection = React.useCallback((hands: string[]) => {
+    if (!isUncontrolled) return;
+    
+    setInternalRange(prev => {
+      const newMap = new Map(prev);
+      
+      // Determine next action based on current state of all selected hands
+      const handStates = hands.map(hand => newMap.get(hand)?.action || null);
+      const uniqueStates = [...new Set(handStates)];
+      
+      let nextAction: 'raise' | 'call' | 'fold' | undefined = 'raise';
+      
+      if (uniqueStates.length === 1) {
+        // All hands have same state, advance to next
+        const currentState = uniqueStates[0];
+        switch (currentState) {
+          case null:
+            nextAction = 'raise';
+            break;
+          case 'raise':
+            nextAction = 'call';
+            break;
+          case 'call':
+            nextAction = 'fold';
+            break;
+          case 'fold':
+            nextAction = allowRemove ? undefined : 'raise';
+            break;
+          default:
+            nextAction = 'raise';
+        }
+      } else {
+        // Mixed states, set all to raise
+        nextAction = 'raise';
+      }
+      
+      hands.forEach(hand => {
+        if (nextAction) {
+          newMap.set(hand, { hand, frequency: 1.0, action: nextAction });
+        } else {
+          newMap.delete(hand);
+        }
+      });
+      
+      return newMap;
+    });
+  }, [isUncontrolled, allowRemove]);
 
   // Global mouse up handler to catch mouse up outside the matrix
   React.useEffect(() => {
     const handleGlobalMouseUp = () => {
       if (isMouseDown) {
-        if (isDragging && draggedHands.size > 1 && onHandsBulkSelect) {
-          // Use bulk selection for drag operations (only if multiple hands)
-          onHandsBulkSelect(Array.from(draggedHands));
-        } else if (dragStartHand && onHandSelect && !isDragging) {
-          // Use single selection for single clicks (only if not dragging)
-          onHandSelect(dragStartHand);
+        if (isDragging && draggedHands.size > 1) {
+          // Uncontrolled mode - bulk selection
+          if (isUncontrolled) {
+            handleBulkSelection(Array.from(draggedHands));
+          } else if (onHandsBulkSelect) {
+            onHandsBulkSelect(Array.from(draggedHands));
+          }
+        } else if (dragStartHand && !isDragging) {
+          // Single click handled by onClick
         }
         
         // Reset drag state
@@ -162,7 +327,7 @@ export const RangeMatrix: React.FC<RangeMatrixProps> = ({
 
     document.addEventListener('mouseup', handleGlobalMouseUp);
     return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
-  }, [isMouseDown, isDragging, draggedHands, dragStartHand, onHandsBulkSelect, onHandSelect]);
+  }, [isMouseDown, isDragging, draggedHands, dragStartHand, onHandsBulkSelect, isUncontrolled, handleBulkSelection]);
 
   return (
     <div className={`range-matrix ${className}`}>
@@ -191,7 +356,7 @@ export const RangeMatrix: React.FC<RangeMatrixProps> = ({
                     rowIndex === colIndex ? 'pocket-pair' : 
                     rowIndex < colIndex ? 'suited' : 'offsuit'
                   } ${getCellClasses(hand)}`}
-                  onClick={handleCellClick}
+                  onClick={() => handleCellClick(hand)}
                   onMouseDown={() => handleMouseDown(hand)}
                   onMouseEnter={() => handleMouseEnter(hand)}
                 >

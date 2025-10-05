@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { RangeMatrix, getPredefinedRanges, getSavedRanges, saveCustomRange, deleteCustomRange } from '../../../RangeMatrix';
 import { RangeSelector } from '../RangeSelector';
-import type { PredefinedRange, RangeSelection } from '../../../RangeMatrix';
+import type { PredefinedRange } from '../../../RangeMatrix';
 import './RangeAnalysis.scss';
 
 export interface RangeAnalysisProps {
@@ -12,7 +12,7 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
   const [selectedRangeKey, setSelectedRangeKey] = useState<string>('customRange');
   const [showFrequencies, setShowFrequencies] = useState(false);
   const [showActions, setShowActions] = useState(false);
-  const [customRangeHands, setCustomRangeHands] = useState<Map<string, RangeSelection>>(new Map());
+  const [customRange, setCustomRange] = useState<PredefinedRange | undefined>(undefined);
   const [refreshKey, setRefreshKey] = useState(0); // Force re-render when ranges change
 
   const predefinedRanges = React.useMemo(() => getPredefinedRanges(), []);
@@ -20,119 +20,26 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
 
   const handleRangeChange = (rangeKey: string) => {
     setSelectedRangeKey(rangeKey);
-    // Clear custom hands when switching away from custom range
+    // Clear custom range when switching away from custom range
     if (rangeKey !== 'customRange') {
-      setCustomRangeHands(new Map());
+      setCustomRange(undefined);
     }
-  };
-
-  const handleHandSelect = (hand: string) => {
-    console.log('Selected hand:', hand);
-    
-    // Only allow custom selection when custom range is selected
-    if (selectedRangeKey === 'customRange') {
-      setCustomRangeHands(prev => {
-        const newMap = new Map(prev);
-        const currentSelection = newMap.get(hand);
-        
-        if (!currentSelection) {
-          // First click: Add as raise
-          newMap.set(hand, { hand, frequency: 1.0, action: 'raise' });
-        } else {
-          // Cycle through actions: raise → call → fold → remove
-          switch (currentSelection.action) {
-            case 'raise':
-              newMap.set(hand, { hand, frequency: 1.0, action: 'call' });
-              break;
-            case 'call':
-              newMap.set(hand, { hand, frequency: 1.0, action: 'fold' });
-              break;
-            case 'fold':
-              // Remove from range (fourth click)
-              newMap.delete(hand);
-              break;
-            default:
-              newMap.set(hand, { hand, frequency: 1.0, action: 'raise' });
-          }
-        }
-        
-        return newMap;
-      });
-    }
-    // For saved ranges and predefined ranges, we don't allow modification
-    // The range is displayed as-is from the selectedRange
-  };
-
-  const handleHandsBulkSelect = (hands: string[]) => {
-    console.log('Bulk selected hands:', hands);
-    
-    // Only allow custom selection when custom range is selected
-    if (selectedRangeKey === 'customRange') {
-      setCustomRangeHands(prev => {
-        const newMap = new Map(prev);
-        
-        // For bulk selection, determine the next action based on the most common state
-        // If hands have mixed states, default to 'raise'
-        // If all hands have the same state, advance to next state
-        const handStates = hands.map(hand => newMap.get(hand)?.action || null);
-        const uniqueStates = [...new Set(handStates)];
-        
-        let nextAction: 'raise' | 'call' | 'fold' | undefined = 'raise';
-        
-        if (uniqueStates.length === 1) {
-          // All hands have the same state, advance to next
-          const currentState = uniqueStates[0];
-          switch (currentState) {
-            case null:
-              nextAction = 'raise';
-              break;
-            case 'raise':
-              nextAction = 'call';
-              break;
-            case 'call':
-              nextAction = 'fold';
-              break;
-            case 'fold':
-              nextAction = undefined; // Remove
-              break;
-            default:
-              nextAction = 'raise';
-          }
-        } else {
-          // Mixed states or some unselected hands, set all to 'raise'
-          nextAction = 'raise';
-        }
-        
-        hands.forEach(hand => {
-          if (nextAction) {
-            newMap.set(hand, { hand, frequency: 1.0, action: nextAction });
-          } else {
-            newMap.delete(hand);
-          }
-        });
-        
-        return newMap;
-      });
-    }
-    // For saved ranges and predefined ranges, we don't allow modification
-    // The range is displayed as-is from the selectedRange
   };
 
   const handleClearCustomRange = () => {
-    setCustomRangeHands(new Map());
+    setCustomRange(undefined);
   };
 
   const handleSaveCustomRange = (name: string) => {
-    if (customRangeHands.size > 0) {
-      const customRange: PredefinedRange = {
+    if (customRange && customRange.hands.length > 0) {
+      const rangeToSave: PredefinedRange = {
+        ...customRange,
         name,
-        description: `Custom saved range with ${customRangeHands.size} hands`,
-        color: "#6b7280",
-        hands: Array.from(customRangeHands.values())
+        description: `Custom saved range with ${customRange.hands.length} hands`
       };
       
       try {
-        saveCustomRange(name, customRange);
+        saveCustomRange(name, rangeToSave);
         setRefreshKey(prev => prev + 1); // Force re-render to show new saved range
         alert(`Range "${name}" saved successfully!`);
       } catch (error) {
@@ -158,14 +65,12 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
 
   const selectedRange: PredefinedRange | undefined = React.useMemo(() => {
     if (selectedRangeKey === 'customRange') {
-      // Create a custom range from selected hands
-      return {
+      // Use customRange state or return placeholder
+      return customRange || {
         name: "Custom Range (Click hands to select)",
-        description: customRangeHands.size > 0 
-          ? `Custom range with ${customRangeHands.size} selected hands`
-          : "Build your own custom range by clicking on hands in the matrix",
+        description: "Build your own custom range by clicking on hands in the matrix",
         color: "#6b7280",
-        hands: Array.from(customRangeHands.values())
+        hands: []
       };
     }
     
@@ -180,7 +85,7 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
     }
     
     return undefined;
-  }, [selectedRangeKey, customRangeHands, predefinedRanges, savedRanges]);
+  }, [selectedRangeKey, customRange, predefinedRanges, savedRanges]);
 
   return (
     <div className={`range-analysis ${className}`}>
@@ -191,7 +96,7 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
         onShowFrequenciesChange={setShowFrequencies}
         showActions={showActions}
         onShowActionsChange={setShowActions}
-        customRangeCount={customRangeHands.size}
+        customRangeCount={customRange?.hands.length || 0}
         onClearCustomRange={handleClearCustomRange}
         onSaveCustomRange={handleSaveCustomRange}
         onDeleteRange={handleDeleteRange}
@@ -199,11 +104,12 @@ export const RangeAnalysis: React.FC<RangeAnalysisProps> = ({ className = '' }) 
 
       <div className="range-matrix-container">
         <RangeMatrix
-          selectedRange={selectedRange}
+          selectedRange={selectedRangeKey !== 'customRange' ? selectedRange : customRange}
           showFrequencies={showFrequencies}
           showActions={showActions}
-          onHandSelect={handleHandSelect}
-          onHandsBulkSelect={handleHandsBulkSelect}
+          isEditable={selectedRangeKey === 'customRange'}
+          editMode="select"
+          onRangeChange={selectedRangeKey === 'customRange' ? setCustomRange : undefined}
         />
       </div>
 
